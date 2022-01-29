@@ -127,7 +127,7 @@ class paramCardState extends State<paramCard> {
                     // Le texte indiquant si la base de donnée est chargée ou non
                     Text(
                       // Le texte change en fonction de isDBLoaded
-                      widget.isDBLoaded ? "Chargée" : "Non chargée",
+                      widget.isDBLoaded ? "Chargées" : "Non chargées",
                       style: TextStyle(
                           // La couleur change en fonction de isDBLoaded
                           color: widget.isDBLoaded

@@ -47,6 +47,7 @@ dependencies:
   url_launcher: ^6.0.17
   font_awesome_flutter: any
   gradient_bottom_navigation_bar: ^1.0.0+4
+  archive: ^3.1.9
   flutter:
     sdk: flutter
 

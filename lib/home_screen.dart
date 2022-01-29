@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
+import 'package:archive/archive.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as path;
 
 import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
@@ -34,7 +36,10 @@ class HomeScreenState extends State<HomeScreen> {
   // L'addresse des cartes en ligne
   final _onlineMapScheme = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
   // L'addresse des cartes hors ligne
-  final _offlineMapScheme = "assets/Tiles/{z}-{x}-{y}.png";
+  final offlinePartMapScheme = "Tiles/{z}-{x}-{y}.png";
+  String _offlineMapScheme = "";
+
+  String MapTilespath = "";
 
   // Le numéro de la page sur laquelle on est
   int _page = 0;
@@ -74,12 +79,12 @@ class HomeScreenState extends State<HomeScreen> {
   // La poisiton centrale de la carte (ECL par défaut)
   LatLng _center = LatLng(45.783218966301575, 4.768481472180009);
 
-  // la connectivité TODO: opti carte (ie jamais co)
+  // la connectivité
   final MyConnectivity _connectivity = MyConnectivity.instance;
 
   // Le controlleur de carte
   MapController _mapController = MapController();
-  // L'état de connection (Wi-Fi, réseau, rien) TODO: à f disparaitre
+  // L'état de connection (Wi-Fi, réseau, rien)
   Map _source = {ConnectivityResult.none: false};
 
   // Quand on quitte l'appliaction
@@ -158,6 +163,22 @@ class HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void MapFromFile() {
+    //TODO: vérif bon fichier
+    /* Génère la base de donnée à partir d'un fichier
+    */
+    // On demande de séléctionner le fichier de la base de donnée
+    pickFile().then((r) {
+      // On récupère les listes de point et bénévoles
+      parseMap(r).then((value) {
+        setState(() {
+          // On indique que la base de donnée est chargée
+          _isTileSetLoaded = true;
+        });
+      });
+    });
+  }
+
   void updateDBStatus() {
     /* Met à jour la valeur de _isDBLoaded
     */
@@ -167,20 +188,13 @@ class HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void updateTileStatus() async {
+  void updateTileStatus() {
     /* Met à jour la valeur de _isDBLoaded
     */
     // On cherche un fichier en particulier
-    var path = "assets/Tiles/0.txt";
-    setState(() {
-      // Si on le trouve
-      try {
-        rootBundle.loadString(path).then((value) => _isTileSetLoaded = true);
-        // Sinon
-      } catch (e) {
-        _isTileSetLoaded = false;
-      }
-    });
+    Directory(MapTilespath).exists().then((value) => setState(() {
+          _isTileSetLoaded = value;
+        }));
   }
 
   List<Point> InitPoints(List<Benevole> ben) {
@@ -293,7 +307,7 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Future<FilePickerResult> pickFile() async {
-    /* Ouvre une fenêtre d'exploration de fichier et retourne le fichier choisis TODO:
+    /* Ouvre une fenêtre d'exploration de fichier et retourne le fichier choisis
     */
     FilePickerResult result = await FilePicker.platform.pickFiles();
     FilePickerResult r = result ?? FilePickerResult([]);
@@ -352,6 +366,33 @@ class HomeScreenState extends State<HomeScreen> {
       return [ben, posPoints];
     }
     return [];
+  }
+
+  Future<void> parseMap(FilePickerResult r) async {
+    // Read the Zip file from disk.
+    final bytes = File(r.files.single.path).readAsBytesSync();
+    // Decode the Zip file
+    getMapTilepath().then((value) {
+      MapTilespath = value;
+      final archive = ZipDecoder().decodeBytes(bytes);
+      // Extract the contents of the Zip archive to disk.
+      for (final file in archive) {
+        final filename = file.name;
+        if (file.isFile) {
+          final data = file.content as List<int>;
+          File(MapTilespath + filename)
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(data);
+        } else {
+          Directory(MapTilespath + filename).create(recursive: true);
+        }
+      }
+    });
+  }
+
+  Future<String> getMapTilepath() async {
+    Directory appDocDirectory = await getApplicationDocumentsDirectory();
+    return appDocDirectory.path + '/map/';
   }
 
   String formatDate(String dd) {
@@ -444,9 +485,7 @@ class HomeScreenState extends State<HomeScreen> {
 
     return FloatingSearchBar(
       hint: 'Rechercher bénévole',
-      hintStyle: TextStyle(
-        color: Constants.text
-      ),
+      hintStyle: TextStyle(color: Constants.text),
       backgroundColor: Constants.background,
       accentColor: Constants.darkgrad,
       scrollPadding: const EdgeInsets.only(top: 20, bottom: 60),
@@ -540,17 +579,17 @@ class HomeScreenState extends State<HomeScreen> {
             child: Row(
               children: [
                 SizedBox(
-                  width: 100,
-                  // On affiche l'icône en fonction du type de bénévole
-                  child: Center(
-                    child: FaIcon(
-                      b.getIcon(),
-                      // la couleur change avec le type de bénévole
-                      color: b.type < 4 ? Constants.lightgrad : Constants.samu,
-                      size: 55,
-                    ),
-                  )
-                ),
+                    width: 100,
+                    // On affiche l'icône en fonction du type de bénévole
+                    child: Center(
+                      child: FaIcon(
+                        b.getIcon(),
+                        // la couleur change avec le type de bénévole
+                        color:
+                            b.type < 4 ? Constants.lightgrad : Constants.samu,
+                        size: 55,
+                      ),
+                    )),
                 Expanded(
                   // l'identité
                   child: b.surnom.isNotEmpty
@@ -635,11 +674,7 @@ class HomeScreenState extends State<HomeScreen> {
         SaveMap();
       });
       // On envoie sur la page du point
-      return pointCard(
-          p: _point,
-          ben: ben,
-          posPoints: posPoints,
-          db: dbm);
+      return pointCard(p: _point, ben: ben, posPoints: posPoints, db: dbm);
       // Si on est sur la page des paramètres
     } else if (_page == 3) {
       setState(() {
@@ -666,11 +701,23 @@ class HomeScreenState extends State<HomeScreen> {
             _isDBLoaded = false;
           });
         },
-        delMap: () {},
+        delMap: () {
+          try {
+            getMapTilepath().then(
+                (value) => Directory(MapTilespath).deleteSync(recursive: true));
+          } catch (e) {
+            print(e);
+          }
+          setState(() {
+            _isTileSetLoaded = false;
+          });
+        },
         addDB: () {
           dataFromFile();
         },
-        addMap: () {},
+        addMap: () {
+          MapFromFile();
+        },
       );
     }
     // Sinon, on est sur la page de la carte
@@ -693,6 +740,7 @@ class HomeScreenState extends State<HomeScreen> {
     result :
           - FlutterMap(Widget)
     */
+    print(_isTileSetLoaded);
     return FlutterMap(
       mapController: _mapController,
       options: MapOptions(
@@ -702,24 +750,30 @@ class HomeScreenState extends State<HomeScreen> {
         rotation: _rotation,
       ),
       layers: [
-        // On affiche la carte
-        TileLayerOptions(
-            urlTemplate: _onlineMapScheme, subdomains: ['a', 'b', 'c']
-            /*_source.keys.toList()[0] == ConnectivityResult.none
+        _isTileSetLoaded // On affiche la carte
+            ? TileLayerOptions(
+                urlTemplate: _offlineMapScheme,
+                tileProvider: FileTileProvider(),
+              )
+            : TileLayerOptions(
+                urlTemplate: _onlineMapScheme,
+                subdomains: ['a', 'b', 'c'],
+              ),
+        /*_source.keys.toList()[0] == ConnectivityResult.none
               ? TileLayerOptions(
                   tileProvider: AssetTileProvider(),
                   urlTemplate: _offlineMapScheme,
                 )
               : TileLayerOptions(
                   urlTemplate: _onlineMapScheme, subdomains: ['a', 'b', 'c']*/
-            /*'https://api.mapbox.com/styles/v1/khurzs/ckw90kcczdmh514pcmhg6rdnm/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoia2h1cnpzIiwiYSI6ImNrdzkwOXR2ZzFxdWMyeW1lMWNlYmZvMnEifQ.4Uy-gUkzVk0q1BXlQ8aHwA',
+        /*'https://api.mapbox.com/styles/v1/khurzs/ckw90kcczdmh514pcmhg6rdnm/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoia2h1cnpzIiwiYSI6ImNrdzkwOXR2ZzFxdWMyeW1lMWNlYmZvMnEifQ.4Uy-gUkzVk0q1BXlQ8aHwA',
           additionalOptions: {
             'accessToken':
         mapController: mapController,
                 'sk.eyJ1Ijoia2h1cnpzIiwiYSI6ImNrdzkxaWxuMTFxeHYyeG1lMXppdTk4djEifQ.Iof7IMiW2Ucnv7SGKlBW3Q',
             'id': 'mapbox.mapbox-streets-v8'
           }*/
-            ),
+
         // On affiche les lignes
         PolylineLayerOptions(polylines: getPolyLines()),
         // On affiche les points
@@ -779,60 +833,65 @@ class HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     /* Crée la page principale
     */
+    getMapTilepath().then((value) {
+      MapTilespath = value;
+      _offlineMapScheme = MapTilespath + offlinePartMapScheme;
+    });
+    print(_offlineMapScheme);
     return WillPopScope(
-        child: Scaffold(
-            // This is handled by the search bar itself.
-            resizeToAvoidBottomInset: false,
-            // On récupère la page sélectionnée
-            body: _getBody(),
-            //appBar: _buildAppBar(context),
-            // La liste des boutons de la barre de navigation
-            bottomNavigationBar: BottomNavBarFb5(
-              l: [
-                IconBottomBar(
-                  text: "Carte",
-                  icon: FontAwesomeIcons.map,
-                  onPressed: () {
-                    setState(() {
-                      _page = 0;
-                    });
-                  },
-                  selected: _page == 0,
-                ),
-                IconBottomBar(
-                  text: "Bénévole",
-                  icon: FontAwesomeIcons.listUl,
-                  onPressed: () {
-                    setState(() {
-                      _page = 1;
-                    });
-                  },
-                  selected: _page == 1,
-                ),
-                IconBottomBar(
-                  text: "Points",
-                  icon: FontAwesomeIcons.mapMarkerAlt,
-                  onPressed: () {
-                    setState(() {
-                      _page = 2;
-                    });
-                  },
-                  selected: _page == 2,
-                ),
-                IconBottomBar(
-                  text: "Paramètres",
-                  icon: FontAwesomeIcons.cog,
-                  onPressed: () {
-                    setState(() {
-                      _page = 3;
-                    });
-                  },
-                  selected: _page == 3,
-                )
-              ],
-            )),
-        // Quand on veut quitter l'application avec le bouton retour
-        //onWillPop: _onWillPop
-      );
+      child: Scaffold(
+          // This is handled by the search bar itself.
+          resizeToAvoidBottomInset: false,
+          // On récupère la page sélectionnée
+          body: _getBody(),
+          //appBar: _buildAppBar(context),
+          // La liste des boutons de la barre de navigation
+          bottomNavigationBar: BottomNavBarFb5(
+            l: [
+              IconBottomBar(
+                text: "Carte",
+                icon: FontAwesomeIcons.map,
+                onPressed: () {
+                  setState(() {
+                    _page = 0;
+                  });
+                },
+                selected: _page == 0,
+              ),
+              IconBottomBar(
+                text: "Bénévole",
+                icon: FontAwesomeIcons.listUl,
+                onPressed: () {
+                  setState(() {
+                    _page = 1;
+                  });
+                },
+                selected: _page == 1,
+              ),
+              IconBottomBar(
+                text: "Points",
+                icon: FontAwesomeIcons.mapMarkerAlt,
+                onPressed: () {
+                  setState(() {
+                    _page = 2;
+                  });
+                },
+                selected: _page == 2,
+              ),
+              IconBottomBar(
+                text: "Paramètres",
+                icon: FontAwesomeIcons.cog,
+                onPressed: () {
+                  setState(() {
+                    _page = 3;
+                  });
+                },
+                selected: _page == 3,
+              )
+            ],
+          )),
+      // Quand on veut quitter l'application avec le bouton retour
+      //onWillPop: _onWillPop
+    );
   }
 }
