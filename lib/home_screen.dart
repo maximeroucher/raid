@@ -44,7 +44,7 @@ class HomeScreenState extends State<HomeScreen> {
   // la rotation de la carte
   double _rotation = 0.0;
   // Le zoom de la carte
-  double _zoom = 15.0;
+  double _zoom = 12.0;
 
   // Si la carte est chargée
   bool _isMapReady = false;
@@ -863,7 +863,7 @@ class HomeScreenState extends State<HomeScreen> {
             l: [
               IconBottomBar(
                 text: "Carte",
-                icon: FontAwesomeIcons.map,
+                icon: FontAwesomeIcons.mapMarkedAlt,
                 onPressed: () {
                   setState(() {
                     _page = 0;
@@ -873,7 +873,7 @@ class HomeScreenState extends State<HomeScreen> {
               ),
               IconBottomBar(
                 text: "Bénévole",
-                icon: FontAwesomeIcons.listUl,
+                icon: FontAwesomeIcons.userAlt,
                 onPressed: () {
                   setState(() {
                     _page = 1;

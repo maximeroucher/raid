@@ -17,9 +17,10 @@ class MyApp extends StatelessWidget {
 
 Json doit changer de nom ou desinstaller app (sinon pb cache)
 
-30/01
+31/01
 
-refaire mappack (tt ds rayon 2h -> 1 seul mappack pr tjr)
+Naviagtion
+
 --------------------------------------------------------------------------------
 
 ./02
@@ -44,16 +45,5 @@ app bénévole (liste mission / liste num autre (msg, tel) / btn arrivée pt / 1
 
 ./02
 
-programme pr créer json (zip mappack)
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-
-Éclair
-
-./02
-
-Site Raid + Forum
-
+programme pr créer json
 */

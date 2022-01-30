@@ -198,7 +198,7 @@ class benCardState extends State<benCard> {
                       Action("sms", b.num);
                     },
                     icon: FaIcon(
-                      FontAwesomeIcons.commentAlt,
+                      Icons.message_rounded,
                       color: Constants.darkbtn,
                       size: 55,
                     )
