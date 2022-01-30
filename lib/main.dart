@@ -17,28 +17,12 @@ class MyApp extends StatelessWidget {
 
 Json doit changer de nom ou desinstaller app (sinon pb cache)
 
-29/01
-
-progressbar (+ toast)
---------------------------------------------------------------------------------
 30/01
 
-db : check fichier correct (verif pdt lecture et parsing juste try / catch)
-    -> toast sinon
-
-map : verif bon format img
-
-mode : -> verif.json == 1,
-       -> offline
-       else
-       -> online (+ save map (si tps pr devt) ./02)
-
+refaire mappack (tt ds rayon 2h -> 1 seul mappack pr tjr)
 --------------------------------------------------------------------------------
 
 ./02
-
-refaire mappack (tt ds rayon 2h -> 1 seul mappack pr tjr)
-
 
 TEST + RÉU° : (Éclair : IOS + autres test)
 

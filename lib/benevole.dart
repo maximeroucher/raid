@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 import 'point.dart';
-import 'constant.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 // Le nom de la table dans la base de donnée

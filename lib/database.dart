@@ -38,7 +38,6 @@ class DatabaseManager {
     */
     // La conversion des types dart en type SQL
     final idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
-    final boolType = 'BOOLEAN NOT NULL';
     final intType = 'INTEGER NOT NULL';
     final stringType = 'TEXT NOT NULL';
     final doubleType = 'REAL NOT NULL';

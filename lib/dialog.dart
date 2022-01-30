@@ -1,7 +1,7 @@
 import 'dart:ui';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'constant.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 
 // Le fenêtre de confirmation

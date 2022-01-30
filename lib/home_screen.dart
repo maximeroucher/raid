@@ -1,17 +1,14 @@
-import 'dart:async';
 import 'dart:io';
+import 'dart:async';
 import 'dart:convert';
 import 'package:archive/archive.dart';
-import 'package:flutter/services.dart';
-import 'package:path/path.dart' as path;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:toast/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 
@@ -23,7 +20,6 @@ import 'constant.dart';
 import 'bottomBar.dart';
 import 'PointCard.dart';
 import 'paramCard.dart';
-import 'connection.dart';
 import 'lienMissionsBeneveloves.dart';
 
 // Le gestionnaire de toutes les pages et de la page de la carte
@@ -36,10 +32,11 @@ class HomeScreenState extends State<HomeScreen> {
   // L'addresse des cartes en ligne
   final _onlineMapScheme = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
   // L'addresse des cartes hors ligne
-  final offlinePartMapScheme = "Tiles/{z}-{x}-{y}.png";
+  final offlinePartMapScheme = "{z}/{x}/{y}.png";
+  // Le chemin vers les cartes hors ligne
   String _offlineMapScheme = "";
-
-  String MapTilespath = "";
+  // Le texte du bouton des cartes
+  String TileText = "Charger les cartes";
 
   // Le numéro de la page sur laquelle on est
   int _page = 0;
@@ -53,8 +50,6 @@ class HomeScreenState extends State<HomeScreen> {
   bool _isMapReady = false;
   // Si la recherche est intialisée
   bool _searchInit = false;
-  // Si on peut quitter l'application avec le bouton retour
-  bool _canback = false;
 
   // Si la base de donnée est chargée
   bool _isDBLoaded = false;
@@ -79,21 +74,8 @@ class HomeScreenState extends State<HomeScreen> {
   // La poisiton centrale de la carte (ECL par défaut)
   LatLng _center = LatLng(45.783218966301575, 4.768481472180009);
 
-  // la connectivité
-  final MyConnectivity _connectivity = MyConnectivity.instance;
-
   // Le controlleur de carte
   MapController _mapController = MapController();
-  // L'état de connection (Wi-Fi, réseau, rien)
-  Map _source = {ConnectivityResult.none: false};
-
-  // Quand on quitte l'appliaction
-  @override
-  void dispose() {
-    // On arrête de regarder si on est connecté
-    _connectivity.disposeStream();
-    super.dispose();
-  }
 
   // Au lancemenent de l'application
   void initState() {
@@ -101,13 +83,6 @@ class HomeScreenState extends State<HomeScreen> {
 
     // Quand la cart est chargée, on change la valeur de _isMapReady
     _mapController.onReady.then((value) => _isMapReady = true);
-
-    // On lance la vérification de la connection
-    _connectivity.initialise();
-    _connectivity.myStream.listen((source) {
-      // On met à jour létat de connection quand il change
-      setState(() => _source = source);
-    });
 
     // On regarde si la base de donnée est accessible
     updateDBStatus();
@@ -140,49 +115,56 @@ class HomeScreenState extends State<HomeScreen> {
     //TODO: vérif bon fichier
     /* Génère la base de donnée à partir d'un fichier
     */
-    // On demande de séléctionner le fichier de la base de donnée
-    pickFile().then((r) {
-      // On récupère les listes de point et bénévoles
-      parseDB(r).then((value) {
-        setState(() {
-          // On indique que la base de donnée est chargée
-          _isDBLoaded = true;
+    try {
+      // On demande de séléctionner le fichier de la base de donnée
+      pickFile().then((r) {
+        // On récupère les listes de point et bénévoles
+        parseDB(r).then((value) {
+          setState(() {
+            // On indique que la base de donnée est chargée
+            _isDBLoaded = true;
+          });
+          // On assigne les points et bénévole
+          ben = value[0];
+          posPoints = value[1];
+          // Le bénévole sélectionné est le premier (La croix rouge)
+          _selected = ben[0];
+          // le point sélectionné est le preimer
+          _point = posPoints[0];
+          // Le centre est la position du premier point
+          _center = _point.pos;
+          // On sauvegarde les données dans la base de donnée
+          Genben();
         });
-        // On assigne les points et bénévole
-        ben = value[0];
-        posPoints = value[1];
-        // Le bénévole sélectionné est le premier (La croix rouge)
-        _selected = ben[0];
-        // le point sélectionné est le preimer
-        _point = posPoints[0];
-        // Le centre est la position du premier point
-        _center = _point.pos;
-        // On sauvegarde les données dans la base de donnée
-        Genben();
       });
-    });
+    } catch (e) {
+      // On affiche un message
+      Toast.show("Fichier incompatible", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+    }
   }
 
   void MapFromFile() {
     //TODO: vérif bon fichier
     /* Génère la base de donnée à partir d'un fichier
     */
-    // On demande de séléctionner le fichier de la base de donnée
-    pickFile().then((r) {
-      // On récupère les listes de point et bénévoles
-      parseMap(r).then((value) {
-        setState(() {
-          // On indique que la base de donnée est chargée
-          _isTileSetLoaded = true;
-        });
+    try {
+      // On demande de séléctionner le fichier zip des cartes
+      pickFile().then((r) {
+        // On récupère les cartes
+        parseMap(r);
       });
-    });
+    } catch (e) {
+      // On affiche un message
+      Toast.show("Fichier incompatible", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+    }
   }
 
   void updateDBStatus() {
     /* Met à jour la valeur de _isDBLoaded
     */
-    // regarde si la base de donnée n'est pas vide
+    // On regarde si la base de donnée n'est pas vide
     dbm.isNotEmpty().then((value) {
       setState(() => _isDBLoaded = value);
     });
@@ -191,10 +173,17 @@ class HomeScreenState extends State<HomeScreen> {
   void updateTileStatus() {
     /* Met à jour la valeur de _isDBLoaded
     */
-    // On cherche un fichier en particulier
-    Directory(MapTilespath).exists().then((value) => setState(() {
-          _isTileSetLoaded = value;
-        }));
+    // On récupère le nom du dossier des cartes
+    getMapTilepath().then((value) {
+    // On regarde si le dossier des cartes existe
+      Directory(value).exists().then((value) => setState(() {
+            // On indique si les cartes sont chargées et on change le message en conséquence
+            _isTileSetLoaded = value;
+            TileText = _isTileSetLoaded
+                ? "Supprimer les cartes"
+                : "Charger les cartes";
+          }));
+    });
   }
 
   List<Point> InitPoints(List<Benevole> ben) {
@@ -360,7 +349,9 @@ class HomeScreenState extends State<HomeScreen> {
             }
           }
         }
+        // On assigne les missions au bénévole
         b.missions = missions;
+        // On ajoute le bénévole
         ben.add(b);
       }
       return [ben, posPoints];
@@ -369,24 +360,62 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> parseMap(FilePickerResult r) async {
-    // Read the Zip file from disk.
+    // On indique que l'on décompresse le fichier
+    setState(() {
+      TileText = "Décompression";
+    });
+    // On lit le fichier
     final bytes = File(r.files.single.path).readAsBytesSync();
-    // Decode the Zip file
-    getMapTilepath().then((value) {
-      MapTilespath = value;
-      final archive = ZipDecoder().decodeBytes(bytes);
-      // Extract the contents of the Zip archive to disk.
-      for (final file in archive) {
-        final filename = file.name;
-        if (file.isFile) {
-          final data = file.content as List<int>;
-          File(MapTilespath + filename)
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(data);
-        } else {
-          Directory(MapTilespath + filename).create(recursive: true);
-        }
+    // On récupère le dossier des cartes
+    var value = await getMapTilepath();
+    // On décompresse
+    final archive = ZipDecoder().decodeBytes(bytes);
+    // Le nombre total de fichier
+    var len = archive.length;
+    // Le nombre de fichier décompressés
+    var x = 0;
+    // Le pourcentage de fichier décompressé
+    var v = (x / len * 100).round();
+    // Le dernier pourcentage
+    var lv = v;
+    // Pour chaque fichier
+    for (final file in archive) {
+      // On récupère son nom
+      final filename = file.name;
+      // Si c'est un ficher
+      if (file.isFile) {
+        // On lit le fichier
+        final data = file.content as List<int>;
+        // On crée le fichier dans le dossier
+        File(value + filename)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(data);
+      // Si c'est un dossier, on le crée
+      } else {
+        Directory(value + filename).create(recursive: true);
       }
+      // On augmente le nombre de fichier décompressé et le pourcentage
+      x++;
+      v = (x / len * 100).round();
+      // Si le pourcentage
+      if (v != lv) {
+        // On met à jour le texte
+        setState(() {
+          TileText = "Chargement (" + v.toString() + "%)";
+        });
+        // On attend pour que le texte se mette à jour
+        await Future.delayed(Duration(microseconds: 1));
+        // On met à jour le dernier pourcentage
+        lv = v;
+      }
+    }
+    // Message en bas pour dire quee l'on a fini
+    Toast.show("Cartes chargées", context,
+        duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+    // On indique que la base de donnée est chargée
+    setState(() {
+      _isTileSetLoaded = true;
+      TileText = "Supprimer les cartes";
     });
   }
 
@@ -450,29 +479,6 @@ class HomeScreenState extends State<HomeScreen> {
       // On l'ajoute à la base de donnée
       await dbm.createBenevole(b);
     }
-  }
-
-  Future<bool> _onWillPop() async {
-    /* La fonction de retour (se lance quand on appuie sur le bouton retour du téléphone)
-    */
-    // Si on peut quitter l'application
-    if (_canback) {
-      // On la quitte
-      SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-      // Sinon
-    } else {
-      // On retourne sur la première page
-      setState(() {
-        _page = 0;
-      });
-    }
-    // Pendant les 800 millisecondes suivantes, si on refait la même action, on quitte l'application
-    Timer(Duration(milliseconds: 800), () {
-      setState(() {
-        _canback = false;
-      });
-    });
-    _canback = true;
   }
 
   Widget buildFloatingSearchBar() {
@@ -703,14 +709,19 @@ class HomeScreenState extends State<HomeScreen> {
         },
         delMap: () {
           try {
-            getMapTilepath().then(
-                (value) => Directory(MapTilespath).deleteSync(recursive: true));
+            getMapTilepath().then((value) {
+              Directory(value).deleteSync(recursive: true);
+              setState(() {
+                _isTileSetLoaded = false;
+                TileText = "Charger les cartes";
+              });
+            });
           } catch (e) {
-            print(e);
+            setState(() {
+              _isTileSetLoaded = false;
+              TileText = "Charger les cartes";
+            });
           }
-          setState(() {
-            _isTileSetLoaded = false;
-          });
         },
         addDB: () {
           dataFromFile();
@@ -718,6 +729,7 @@ class HomeScreenState extends State<HomeScreen> {
         addMap: () {
           MapFromFile();
         },
+        TileText: TileText,
       );
     }
     // Sinon, on est sur la page de la carte
@@ -740,21 +752,24 @@ class HomeScreenState extends State<HomeScreen> {
     result :
           - FlutterMap(Widget)
     */
-    print(_isTileSetLoaded);
     return FlutterMap(
       mapController: _mapController,
       options: MapOptions(
+        maxZoom: 17,
+        minZoom: 8,
         // On met les paramètres de sorte à se retruver avec la carte dans la même état que quand on est partit
         zoom: _zoom,
         center: _center,
         rotation: _rotation,
       ),
       layers: [
-        _isTileSetLoaded // On affiche la carte
+        _isTileSetLoaded
+            // La carte hors ligne
             ? TileLayerOptions(
                 urlTemplate: _offlineMapScheme,
                 tileProvider: FileTileProvider(),
               )
+            // La carte en ligne
             : TileLayerOptions(
                 urlTemplate: _onlineMapScheme,
                 subdomains: ['a', 'b', 'c'],
@@ -817,7 +832,8 @@ class HomeScreenState extends State<HomeScreen> {
                     // On affiche l'icône du point, qui dépend du type du point
                     x.type == 0
                         // Si c'est un point classique
-                        ? Icon(Icons.location_pin, color: x.col, size: 60.0)
+                        ? FaIcon(FontAwesomeIcons.mapMarkerAlt,
+                            color: x.col, size: 52.0)
                         // Si c'est un point principal
                         : Image.asset(
                             'assets/images/ic_marker.png',
@@ -833,18 +849,15 @@ class HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     /* Crée la page principale
     */
+    // On crée le chemin vers le dossier des cartes
     getMapTilepath().then((value) {
-      MapTilespath = value;
-      _offlineMapScheme = MapTilespath + offlinePartMapScheme;
+      _offlineMapScheme = value + offlinePartMapScheme;
     });
-    print(_offlineMapScheme);
-    return WillPopScope(
-      child: Scaffold(
+    return Scaffold(
           // This is handled by the search bar itself.
           resizeToAvoidBottomInset: false,
           // On récupère la page sélectionnée
           body: _getBody(),
-          //appBar: _buildAppBar(context),
           // La liste des boutons de la barre de navigation
           bottomNavigationBar: BottomNavBarFb5(
             l: [
@@ -889,9 +902,7 @@ class HomeScreenState extends State<HomeScreen> {
                 selected: _page == 3,
               )
             ],
-          )),
-      // Quand on veut quitter l'application avec le bouton retour
-      //onWillPop: _onWillPop
-    );
+          )
+        );
   }
 }

@@ -10,6 +10,8 @@ class paramCard extends StatefulWidget {
   bool isDBLoaded, isTileSetLoaded;
   // les fonctions pour supprimer la base de donnée et les cartes
   Function delDB, delMap, addDB, addMap;
+  // Le texte du bouton des cartes
+  String TileText;
 
   paramCard(
       {Key key,
@@ -18,7 +20,8 @@ class paramCard extends StatefulWidget {
       this.delDB,
       this.delMap,
       this.addDB,
-      this.addMap})
+      this.addMap,
+      this.TileText})
       : super(key: key);
 
   @override
@@ -71,50 +74,48 @@ class paramCardState extends State<paramCard> {
                   ),
                   // Le numéro du bénévole
                   Container(
-                    height: 70,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // La courbe à gauche
-                        Container(
-                          width: 70,
-                          height: 70,
-                          child: CustomPaint(
-                            painter: CurvePainter(),
+                      height: 70,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // La courbe à gauche
+                          Container(
+                            width: 70,
+                            height: 70,
+                            child: CustomPaint(
+                              painter: CurvePainter(),
+                            ),
                           ),
-                        ),
-                        Container(
-                          width: 70,
-                        ),
-                      ],
-                    )
-                  ),
+                          Container(
+                            width: 70,
+                          ),
+                        ],
+                      )),
                   // La courbe à droite
                   Container(
-                    height: 70,
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      borderRadius:
-                          BorderRadius.only(topRight: Radius.circular(70)),
-                      color: Colors.grey.shade100,
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 30,
-                        ),
-                        Center(
-                          child: Text(
-                            "Données",
-                            style: TextStyle(
-                                color: Constants.darkgrad,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25),
+                      height: 70,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.only(topRight: Radius.circular(70)),
+                        color: Colors.grey.shade100,
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            height: 30,
                           ),
-                        )
-                      ],
-                    )
-                  )
+                          Center(
+                            child: Text(
+                              "Données",
+                              style: TextStyle(
+                                  color: Constants.darkgrad,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25),
+                            ),
+                          )
+                        ],
+                      ))
                 ],
               ),
             ),
@@ -181,7 +182,7 @@ class paramCardState extends State<paramCard> {
                           end: Alignment.bottomLeft,
                           // Le gradient de couleur dépend de isDBLoaded
                           colors: widget.isDBLoaded
-                              ? [Constants.background, Constants.background]
+                              ? [Constants.darkdel, Constants.lightdel]
                               : [Constants.darkgrad, Constants.lightgrad],
                         ),
                       ),
@@ -192,9 +193,7 @@ class paramCardState extends State<paramCard> {
                             ? "Supprimer les données"
                             : "Charger un fichier",
                         style: TextStyle(
-                            color: widget.isDBLoaded
-                                  ? Constants.darkbtn
-                                  : Constants.background,
+                            color: Constants.background,
                             fontWeight: FontWeight.w900,
                             fontSize: 18),
                       ),
@@ -278,32 +277,25 @@ class paramCardState extends State<paramCard> {
                           end: Alignment.bottomLeft,
                           // le gradient de douleur dépend de isTileSetLoaded
                           colors: widget.isTileSetLoaded
-                              ? [Constants.background, Constants.background]
+                              ? [Constants.darkdel, Constants.lightdel]
                               : [Constants.darkgrad, Constants.lightgrad],
                         ),
                       ),
                       // Le texte du bouton
                       child: Text(
-                        // Le texte dépend de isTileSetLoaded
-                        widget.isTileSetLoaded
-                            ? "Supprimer les cartes"
-                            : "Charger les cartes",
+                        widget.TileText,
                         style: TextStyle(
-                            color: widget.isTileSetLoaded
-                                  ? Constants.darkbtn
-                                  : Constants.background,
+                            color: Constants.background,
                             fontWeight: FontWeight.w900,
                             fontSize: 18),
                       ),
                     ))
-                    ],
-                  ),
+              ],
+            ),
           ],
-        )
-      );
+        ));
   }
 }
-
 
 class CurvePainter extends CustomPainter {
   @override
@@ -315,11 +307,11 @@ class CurvePainter extends CustomPainter {
     // Le tracé de la courbe
     var path = Path();
     path.moveTo(0, 0);
-    final center = new Offset(size.width,0);
+    final center = new Offset(size.width, 0);
     final startAngle = -3.14;
     final endAngle = -3.14 / 2;
-    path.arcTo(new Rect.fromCircle(center: center, radius: 70),
-        startAngle, endAngle, true);
+    path.arcTo(new Rect.fromCircle(center: center, radius: 70), startAngle,
+        endAngle, true);
     path.lineTo(0, size.height);
     path.lineTo(0, 0);
 
