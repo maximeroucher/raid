@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'benevole.dart';
 import 'constant.dart';
+import 'customPainter.dart';
 
 class benCard extends StatefulWidget {
   Benevole b;
@@ -150,6 +151,9 @@ class benCardState extends State<benCard> {
                   )
                 ],
               ),
+            ),
+            Container(
+              height: 20,
             ),
             // Le conteneur de la liste des missions qui s'étend sur toute la hauteur possible
             Expanded(
@@ -342,30 +346,3 @@ class benCardState extends State<benCard> {
   }
 }
 
-class CurvePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    var paint = Paint();
-    paint.color = Colors.grey.shade100;
-    paint.style = PaintingStyle.fill; // Change this to fill
-
-    // Le chemin pour la courbe en haut à droite
-    var path = Path();
-    path.moveTo(0, 0);
-    final center = new Offset(size.width,0);
-    final startAngle = -3.14;
-    final endAngle = -3.14 / 2;
-    path.arcTo(new Rect.fromCircle(center: center, radius: 70),
-        startAngle, endAngle, true);
-    path.lineTo(0, size.height);
-    path.lineTo(0, 0);
-
-    // On remplit la forme déssinée
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
-  }
-}

@@ -3,6 +3,7 @@ import 'package:raidmap/constant.dart';
 
 import 'dialog.dart';
 import 'constant.dart';
+import 'customPainter.dart';
 
 // La page des paramètres
 class paramCard extends StatefulWidget {
@@ -294,33 +295,5 @@ class paramCardState extends State<paramCard> {
             ),
           ],
         ));
-  }
-}
-
-class CurvePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    var paint = Paint();
-    paint.color = Colors.grey.shade100;
-    paint.style = PaintingStyle.fill;
-
-    // Le tracé de la courbe
-    var path = Path();
-    path.moveTo(0, 0);
-    final center = new Offset(size.width, 0);
-    final startAngle = -3.14;
-    final endAngle = -3.14 / 2;
-    path.arcTo(new Rect.fromCircle(center: center, radius: 70), startAngle,
-        endAngle, true);
-    path.lineTo(0, size.height);
-    path.lineTo(0, 0);
-
-    // On rempli la courbe
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
   }
 }

@@ -1,17 +1,14 @@
 import 'dart:math';
-import 'package:cherry_toast/resources/arrays.dart';
+import 'package:toast/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:motion_toast/motion_toast.dart';
-import 'package:motion_toast/resources/arrays.dart';
-import 'package:cherry_toast/cherry_toast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:toast/toast.dart';
 
 import 'point.dart';
 import 'benevole.dart';
 import 'database.dart';
 import 'constant.dart';
+import 'customPainter.dart';
 
 class pointCard extends StatefulWidget {
   pointCard({Key key, this.p, this.ben, this.posPoints, this.db})
@@ -42,7 +39,7 @@ class benCardState extends State<pointCard> {
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
+                  spreadRadius: 2,
                   blurRadius: 5,
                   offset: Offset(0, 5), //  changes position of shadow
                 ),
@@ -57,13 +54,19 @@ class benCardState extends State<pointCard> {
                   e.surnom.isNotEmpty ? e.surnom : e.nom,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      color: Constants.text,
+                      color: Constants.darkgrad,
                       fontWeight: FontWeight.bold,
                       fontSize: 25),
+                ),
+                Container(
+                  height: 2,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
+                    Container(
+                      height: 0,
+                    ),
                     Container(
                       height: 90,
                       child: Column(
@@ -76,56 +79,17 @@ class benCardState extends State<pointCard> {
                               onPressed: () {
                                 setState(() {
                                   if (e.missions[e.indexMission].nom == p.nom) {
-                                    // Le point précédent
-                                    Point prev =
-                                        findPoint(e.missions[e.indexMission].nom);
-                                    // On enlève le bénévole du point où il était avant
-                                    prev.numOnPoint = max(prev.numOnPoint - 1, 0);
-                                    // On change l'index du point de la mission actuelle
-                                    e.indexMission = ind;
-                                    // On ajoute la personne aux personnes sur ce point
-                                    p.numOnPoint++;
-                                    // On change le point actuel
-                                    e.pointActuel = p;
-                                    // Le bénévole vient d'arriver
-                                    e.statusMission = 0;
-                                    // Le status du point
-                                    p.status = Pben
-                                      // On filtre les personnes qui sont sur ce point
-                                      .where((element) => element.missions[element.indexMission].nom == p.nom)
-                                      // On regarde leur status
-                                      .map((e) => e.statusMission)
-                                      // On retransforme en liste
-                                      .toList()
-                                      // On en prend le maximum
-                                      .reduce(max);
-                                    // On récupère la couleur
-                                    p.getCol();
-                                    // On met à jour le status du point précédent
-                                    prev.status = getPointBen(prev)
-                                      // On filtre les personnes qui sont sur ce point
-                                      .where((element) => element.missions[element.indexMission].nom == prev.nom)
-                                      // On regarde leur status
-                                      .map((e) => e.statusMission)
-                                      // On retransforme en liste
-                                      .toList()
-                                      // On en prend le maximum
-                                      .reduce(max);
-                                    // On récupère la couleur
-                                    prev.getCol();
-                                    // On met à jour le bénévole
-                                    widget.db.updateBenevole(e);
-                                    // On met à jour le point
-                                    widget.db.updatePoint(p);
-                                    // On met à jour le point précédent
-                                    widget.db.updatePoint(prev);
+                                    update(e, p, ind, Pben, 0);
                                   }
                                 });
                               },
                               icon: FaIcon(
                                 FontAwesomeIcons.times,
-                                size: (!check || e.statusMission == 0) ? 40 : 35,
-                                color: Constants.text,
+                                size:
+                                    (!check || e.statusMission == 0) ? 45 : 40,
+                                color: (!check || e.statusMission == 0)
+                                      ? Constants.personne
+                                      : Constants.disable,
                               ),
                             ),
                           ),
@@ -138,7 +102,9 @@ class benCardState extends State<pointCard> {
                               "Personne",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  color: Constants.text,
+                                  color: (!check || e.statusMission == 0)
+                                      ? Constants.personne
+                                      : Constants.disable,
                                   fontWeight: FontWeight.bold,
                                   fontSize: (!check || e.statusMission == 0)
                                       ? 15
@@ -158,57 +124,15 @@ class benCardState extends State<pointCard> {
                             child: IconButton(
                               onPressed: () {
                                 setState(() {
-                                  // Le point précédent
-                                  Point prev =
-                                      findPoint(e.missions[e.indexMission].nom);
-                                  // On enlève le bénévole du point où il était avant
-                                  prev.numOnPoint = max(prev.numOnPoint - 1, 0);
-                                  // On change l'index du point de la mission actuelle
-                                  e.indexMission = ind;
-                                  // On ajoute la personne aux personnes sur ce point
-                                  p.numOnPoint++;
-                                  // On change le point actuel
-                                  e.pointActuel = p;
-                                  // Le bénévole vient d'arriver
-                                  e.statusMission = 1;
-                                  // Le status du point
-                                  p.status = Pben
-                                    // On filtre les personnes qui sont sur ce point
-                                    .where((element) => element.missions[element.indexMission].nom == p.nom)
-                                    // On regarde leur status
-                                    .map((e) => e.statusMission)
-                                    // On retransforme en liste
-                                    .toList()
-                                    // On en prend le maximum
-                                    .reduce(max);
-                                  // On récupère la couleur
-                                  p.getCol();
-                                  // On met à jour le status du point précédent
-                                  prev.status = getPointBen(prev)
-                                    // On filtre les personnes qui sont sur ce point
-                                    .where((element) => element.missions[element.indexMission].nom == prev.nom)
-                                    // On regarde leur status
-                                    .map((e) => e.statusMission)
-                                    // On retransforme en liste
-                                    .toList()
-                                    // On en prend le maximum
-                                    .reduce(max);
-                                  // On récupère la couleur
-                                  prev.getCol();
-                                  // On met à jour le bénévole
-                                  widget.db.updateBenevole(e);
-                                  // On met à jour le point
-                                  widget.db.updatePoint(p);
-                                  // On met à jour le point précédent
-                                  widget.db.updatePoint(prev);
+                                  update(e, p, ind, Pben, 1);
                                 });
                               },
                               icon: FaIcon(
                                 FontAwesomeIcons.mapMarkerAlt,
                                 size: (check && e.statusMission == 1) ? 40 : 35,
                                 color: (check && e.statusMission == 1)
-                                ? Constants.arrivee
-                                : Constants.text,
+                                    ? Constants.arrivee
+                                    : Constants.disable,
                               ),
                             ),
                           ),
@@ -223,7 +147,7 @@ class benCardState extends State<pointCard> {
                               style: TextStyle(
                                 color: (check && e.statusMission == 1)
                                     ? Constants.arrivee
-                                    : Constants.text,
+                                    : Constants.disable,
                                 fontWeight: FontWeight.bold,
                                 fontSize:
                                     (check && e.statusMission == 1) ? 15 : 13,
@@ -243,59 +167,15 @@ class benCardState extends State<pointCard> {
                             child: IconButton(
                               onPressed: () {
                                 setState(() {
-                                  // Le point précédent
-                                  Point prev =
-                                      findPoint(e.missions[e.indexMission].nom);
-                                  // On enlève le bénévole du point où il était avant
-                                  prev.numOnPoint = max(prev.numOnPoint - 1, 0);
-                                  // On change l'index du point de la mission actuelle
-                                  e.indexMission = ind;
-                                  // On ajoute la personne aux personnes sur ce point
-                                  p.numOnPoint++;
-                                  // On change le point actuel
-                                  e.pointActuel = p;
-                                  // Le bénévole vient d'arriver
-                                  e.statusMission = 2;
-                                  // Le status du point
-                                  p.status = Pben
-                                    // On filtre les personnes qui sont sur ce point
-                                    .where((element) => element.missions[element.indexMission].nom == p.nom)
-                                    // On regarde leur status
-                                    .map((e) => e.statusMission)
-                                    // On retransforme en liste
-                                    .toList()
-                                    // On en prend le maximum
-                                    .reduce(max);
-                                  // On récupère la couleur
-                                  p.getCol();
-                                  // On met à jour le status du point précédent
-                                  prev.status = getPointBen(prev)
-                                    // On filtre les personnes qui sont sur ce point
-                                    .where((element) => element.missions[element.indexMission].nom == prev.nom)
-                                    // On regarde leur status
-                                    .map((e) => e.statusMission)
-                                    // On retransforme en liste
-                                    .toList()
-                                    // On en prend le maximum
-                                    .reduce(max);
-                                  // On récupère la couleur
-                                  prev.getCol();
-                                  // On met à jour le bénévole
-                                  widget.db.updateBenevole(e);
-                                  // On met à jour le point
-                                  widget.db.updatePoint(p);
-                                  // On met à jour le point précédent
-                                  widget.db.updatePoint(prev);
+                                  update(e, p, ind, Pben, 2);
                                 });
                               },
-                              icon: FaIcon(
-                                FontAwesomeIcons.trophy,
+                              icon: FaIcon(FontAwesomeIcons.trophy,
                                   size:
                                       (check && e.statusMission == 2) ? 40 : 35,
                                   color: (check && e.statusMission == 2)
-                                        ? Constants.premier
-                                        : Constants.text
-                                  ),
+                                      ? Constants.premier
+                                      : Constants.disable),
                             ),
                           ),
                           Container(
@@ -308,8 +188,8 @@ class benCardState extends State<pointCard> {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: (check && e.statusMission == 2)
-                                        ? Constants.premier
-                                        : Constants.text,
+                                      ? Constants.premier
+                                      : Constants.disable,
                                   fontWeight: FontWeight.bold,
                                   fontSize: (check && e.statusMission == 2)
                                       ? 15
@@ -329,58 +209,15 @@ class benCardState extends State<pointCard> {
                             child: IconButton(
                               onPressed: () {
                                 setState(() {
-                                  // Le point précédent
-                                  Point prev =
-                                      findPoint(e.missions[e.indexMission].nom);
-                                  // On enlève le bénévole du point où il était avant
-                                  prev.numOnPoint = max(prev.numOnPoint - 1, 0);
-                                  // On change l'index du point de la mission actuelle
-                                  e.indexMission = ind;
-                                  // On ajoute la personne aux personnes sur ce point
-                                  p.numOnPoint++;
-                                  // On change le point actuel
-                                  e.pointActuel = p;
-                                  // Le bénévole vient d'arriver
-                                  e.statusMission = 3;
-                                  // Le status du point
-                                  p.status = Pben
-                                    // On filtre les personnes qui sont sur ce point
-                                    .where((element) => element.missions[element.indexMission].nom == p.nom)
-                                    // On regarde leur status
-                                    .map((e) => e.statusMission)
-                                    // On retransforme en liste
-                                    .toList()
-                                    // On en prend le maximum
-                                    .reduce(max);
-                                  // On récupère la couleur
-                                  p.getCol();
-                                  // On met à jour le status du point précédent
-                                  prev.status = getPointBen(prev)
-                                    // On filtre les personnes qui sont sur ce point
-                                    .where((element) => element.missions[element.indexMission].nom == prev.nom)
-                                    // On regarde leur status
-                                    .map((e) => e.statusMission)
-                                    // On retransforme en liste
-                                    .toList()
-                                    // On en prend le maximum
-                                    .reduce(max);
-                                  // On récupère la couleur
-                                  prev.getCol();
-                                  // On met à jour le bénévole
-                                  widget.db.updateBenevole(e);
-                                  // On met à jour le point
-                                  widget.db.updatePoint(p);
-                                  // On met à jour le point précédent
-                                  widget.db.updatePoint(prev);
+                                  update(e, p, ind, Pben, 3);
                                 });
                               },
-                            icon: FaIcon(
-                              FontAwesomeIcons.stopwatch,
-                              size: (check && e.statusMission == 3) ? 40 : 35,
-                              color: (check && e.statusMission == 3)
-                                    ? Constants.dernier
-                                    : Constants.text
-                              ),
+                              icon: FaIcon(FontAwesomeIcons.stopwatch,
+                                  size:
+                                      (check && e.statusMission == 3) ? 40 : 35,
+                                  color: (check && e.statusMission == 3)
+                                      ? Constants.dernier
+                                      : Constants.disable),
                             ),
                           ),
                           Container(
@@ -393,8 +230,8 @@ class benCardState extends State<pointCard> {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: (check && e.statusMission == 3)
-                                        ? Constants.dernier
-                                        : Constants.text,
+                                      ? Constants.dernier
+                                      : Constants.disable,
                                   fontWeight: FontWeight.bold,
                                   fontSize: (check && e.statusMission == 3)
                                       ? 15
@@ -404,12 +241,66 @@ class benCardState extends State<pointCard> {
                         ],
                       ),
                     ),
+                    Container(
+                      height: 0,
+                    ),
                   ],
                 )
               ],
             )),
       ),
     );
+  }
+
+  void update(Benevole e, Point p, int ind, List<Benevole> Pben, int i) {
+      // Le point précédent
+      Point prev = findPoint(e.missions[e.indexMission].nom);
+      // On enlève le bénévole du point où il était avant
+      prev.numOnPoint = max(prev.numOnPoint - 1, 0);
+      // On change l'index du point de la mission actuelle
+      e.indexMission = ind;
+      // On ajoute la personne aux personnes sur ce point
+      p.numOnPoint++;
+      // On change le point actuel
+      e.pointActuel = p;
+      // Le bénévole vient d'arriver
+      e.statusMission = i;
+      // Le status du point
+      p.status = Pben
+              // On filtre les personnes qui sont sur ce point
+              .where((element) =>
+                  element.missions[element.indexMission].nom == p.nom)
+          // On regarde leur status
+          .map((element) => element.statusMission)
+          // On retransforme en liste
+          .toList()
+          // On en prend le maximum
+          .reduce(max);
+      // On récupère la couleur
+      p.getCol();
+      List<Benevole> listPrev = getPointBen(prev)
+          // On filtre les personnes qui sont sur ce point
+          .where((element) =>
+              element.missions[element.indexMission].nom == prev.nom)
+          .toList();
+      // On met à jour le status du point précédent
+      prev.status = (listPrev.length > 0)
+          ? listPrev
+              // On regarde leur status
+              .map((element) => element.statusMission)
+              // On retransforme en liste
+              .toList()
+              // On en prend le maximum
+              .reduce(max)
+          : 0;
+      // On récupère la couleur
+      prev.getCol();
+      // On met à jour le bénévole
+      widget.db.updateBenevole(e);
+      // On met à jour le point
+      widget.db.updatePoint(p);
+      // On met à jour le point précédent
+      widget.db.updatePoint(prev);
   }
 
   Point findPoint(String nom) {
@@ -453,154 +344,128 @@ class benCardState extends State<pointCard> {
     return Container(
       color: Colors.grey.shade100,
       child: SingleChildScrollView(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Container(
-            height: 300,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("assets/images/backgroundtest.jpg"),
-                fit: BoxFit.cover,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Container(
+              height: 300,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("assets/images/backgroundtest.jpg"),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    height: 60,
+                  ),
+                  Container(
+                    height: 35,
+                    child: Text(
+                      p.nom,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Constants.background,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 35),
+                    ),
+                  ),
+                  // Le nom du bénévole
+                  Container(
+                    height: 65,
+                    child: GestureDetector(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Container(
+                            width: 20,
+                          ),
+                          Column(children: [
+                            Container(
+                              height: 45,
+                            ),
+                            Text(
+                              "Lat : " +
+                                  p.lat.toStringAsFixed(6) +
+                                  ", Long : " +
+                                  p.long.toStringAsFixed(6),
+                              style: TextStyle(
+                                  color: Constants.background,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15),
+                            ),
+                          ]),
+                          Column(children: [
+                            Container(
+                              height: 40,
+                            ),
+                            FaIcon(
+                              FontAwesomeIcons.copy,
+                              size: 22,
+                              color: Constants.background,
+                            ),
+                          ]),
+                          Container(
+                            width: 20,
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: position));
+                        Toast.show("Position copiée", context,
+                            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                      },
+                    ),
+                  ),
+                  // Le numéro du bénévole
+                  Container(
+                      height: 70,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            width: 70,
+                            height: 70,
+                            child: CustomPaint(
+                              painter: CurvePainter(),
+                            ),
+                          ),
+                        ],
+                      )),
+                  Container(
+                      height: 70,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.only(topRight: Radius.circular(70)),
+                        color: Colors.grey.shade100,
+                      ),
+                      alignment: Alignment.center,
+                      child: Column(children: [
+                        Container(
+                          height: 35,
+                        ),
+                        Text(
+                          "Bénévoles",
+                          style: TextStyle(
+                              color: Constants.darkgrad,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 25),
+                        )
+                      ]))
+                ],
               ),
             ),
-            child: Column(
-              children: [
-                Container(
-                  height: 60,
-                ),
-                Container(
-                  height: 35,
-                  child: Text(
-                    p.nom,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Constants.background,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 35),
-                  ),
-                ),
-                // Le nom du bénévole
-                Container(
-                  height: 65,
-                  child: GestureDetector(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Container(
-                          width: 20,
-                        ),
-                        Column(children: [
-                          Container(
-                            height: 45,
-                          ),
-                          Text(
-                            "Lat : " +
-                                p.lat.toStringAsFixed(6) +
-                                ", Long : " +
-                                p.long.toStringAsFixed(6),
-                            style: TextStyle(
-                                color: Constants.background,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15),
-                          ),
-                        ]),
-                        Column(children: [
-                          Container(
-                            height: 40,
-                          ),
-                          FaIcon(
-                            FontAwesomeIcons.copy,
-                            size: 22,
-                            color: Constants.background,
-                          ),
-                        ]),
-                        Container(
-                          width: 20,
-                        ),
-                      ],
-                    ),
-                    onTap: () {
-                      Clipboard.setData(ClipboardData(text: position));
-                      Toast.show("Position copiée", context,
-                          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-                    },
-                  ),
-                ),
-                // Le numéro du bénévole
-                Container(
-                    height: 70,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          width: 70,
-                          height: 70,
-                          child: CustomPaint(
-                            painter: CurvePainter(),
-                          ),
-                        ),
-                      ],
-                    )),
-                Container(
-                    height: 70,
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      borderRadius:
-                          BorderRadius.only(topRight: Radius.circular(70)),
-                      color: Colors.grey.shade100,
-                    ),
-                    alignment: Alignment.center,
-                    child: Column(children: [
-                      Container(
-                        height: 35,
-                      ),
-                      Text(
-                        "Bénévoles",
-                        style: TextStyle(
-                            color: Constants.darkgrad,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 25),
-                      )
-                    ]))
-              ],
-            ),
-          ),
-          Column(
-              children: Pben.map((e) {
-            List<String> pt = e.missions.map((g) => g.nom).toList();
-            int ind = pt.indexOf(p.nom);
-            int k = Pben.indexOf(e);
-            return buildCard(e, p, ind, k);
-          }).toList())
+            Column(
+                children: Pben.map((e) {
+              List<String> pt = e.missions.map((g) => g.nom).toList();
+              int ind = pt.indexOf(p.nom);
+              int k = Pben.indexOf(e);
+              return buildCard(e, p, ind, k);
+            }).toList())
         ],
       )),
     );
-  }
-}
-
-class CurvePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    var paint = Paint();
-    paint.color = Colors.grey.shade100;
-    paint.style = PaintingStyle.fill; // Change this to fill
-
-    var path = Path();
-    path.moveTo(0, 0);
-    final center = new Offset(size.width, 0);
-    final startAngle = -3.14;
-    final endAngle = -3.14 / 2;
-    path.arcTo(new Rect.fromCircle(center: center, radius: 70), startAngle,
-        endAngle, true);
-    path.lineTo(0, size.height);
-    path.lineTo(0, 0);
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
   }
 }

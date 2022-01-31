@@ -44,7 +44,7 @@ class HomeScreenState extends State<HomeScreen> {
   // la rotation de la carte
   double _rotation = 0.0;
   // Le zoom de la carte
-  double _zoom = 12.0;
+  double _zoom = 15.0;
 
   // Si la carte est chargée
   bool _isMapReady = false;
@@ -175,7 +175,7 @@ class HomeScreenState extends State<HomeScreen> {
     */
     // On récupère le nom du dossier des cartes
     getMapTilepath().then((value) {
-    // On regarde si le dossier des cartes existe
+      // On regarde si le dossier des cartes existe
       Directory(value).exists().then((value) => setState(() {
             // On indique si les cartes sont chargées et on change le message en conséquence
             _isTileSetLoaded = value;
@@ -351,6 +351,11 @@ class HomeScreenState extends State<HomeScreen> {
         }
         // On assigne les missions au bénévole
         b.missions = missions;
+        // Si le bénévole a des missions (tout le monde sauf le samu et les bénévoles sportifs)
+        if (b.missions.length > 0) {
+          // On charge le point actuel
+          b.pointActuel = b.missions[b.indexMission];
+        }
         // On ajoute le bénévole
         ben.add(b);
       }
@@ -364,6 +369,8 @@ class HomeScreenState extends State<HomeScreen> {
     setState(() {
       TileText = "Décompression";
     });
+    // On attend pour que le texte se mette à jour
+    await Future.delayed(Duration(microseconds: 1));
     // On lit le fichier
     final bytes = File(r.files.single.path).readAsBytesSync();
     // On récupère le dossier des cartes
@@ -390,7 +397,7 @@ class HomeScreenState extends State<HomeScreen> {
         File(value + filename)
           ..createSync(recursive: true)
           ..writeAsBytesSync(data);
-      // Si c'est un dossier, on le crée
+        // Si c'est un dossier, on le crée
       } else {
         Directory(value + filename).create(recursive: true);
       }
@@ -667,72 +674,37 @@ class HomeScreenState extends State<HomeScreen> {
     */
     // Si on est sur la page bénévole
     if (_page == 1) {
-      // On sauvegarde les pararmètres de la carte
-      setState(() {
-        SaveMap();
-      });
-      // On envoie sur la page du bénévole
-      return benCard(b: _selected);
+      return getBenPage();
       // Si on est sur la page point
     } else if (_page == 2) {
-      // On sauvegarde les pararmètres de la carte
-      setState(() {
-        SaveMap();
-      });
-      // On envoie sur la page du point
-      return pointCard(p: _point, ben: ben, posPoints: posPoints, db: dbm);
+      return getPointPage();
       // Si on est sur la page des paramètres
     } else if (_page == 3) {
-      setState(() {
-        // On sauvegarde les pararmètres de la carte
-        SaveMap();
-      });
-      // On envoie sur la page des paramètres
-      return paramCard(
-        isDBLoaded: _isDBLoaded,
-        isTileSetLoaded: _isTileSetLoaded,
-        delDB: () {
-          dbm.delAll();
-          setState(() {
-            // On assigne les points et bénévole
-            ben = [];
-            posPoints = [];
-            // Le bénévole sélectionné est le premier (La croix rouge)
-            _selected = Benevole.empty();
-            // le point sélectionné est le preimer
-            _point = Point.empty();
-            // Le centre est la position du premier point
-            _center = _point.pos;
-            // On indique que la base de donnée n'est pas chargée
-            _isDBLoaded = false;
-          });
-        },
-        delMap: () {
-          try {
-            getMapTilepath().then((value) {
-              Directory(value).deleteSync(recursive: true);
-              setState(() {
-                _isTileSetLoaded = false;
-                TileText = "Charger les cartes";
-              });
-            });
-          } catch (e) {
-            setState(() {
-              _isTileSetLoaded = false;
-              TileText = "Charger les cartes";
-            });
-          }
-        },
-        addDB: () {
-          dataFromFile();
-        },
-        addMap: () {
-          MapFromFile();
-        },
-        TileText: TileText,
-      );
+      return getParamPage();
     }
     // Sinon, on est sur la page de la carte
+    return getMapPage();
+  }
+
+  Widget getBenPage() {
+    // On sauvegarde les pararmètres de la carte
+    setState(() {
+      SaveMap();
+    });
+    // On envoie sur la page du bénévole
+    return benCard(b: _selected);
+  }
+
+  Widget getPointPage() {
+    // On sauvegarde les pararmètres de la carte
+    setState(() {
+      SaveMap();
+    });
+    // On envoie sur la page du point
+    return pointCard(p: _point, ben: ben, posPoints: posPoints, db: dbm);
+  }
+
+  Widget getMapPage() {
     return Container(
         child: Scaffold(
       resizeToAvoidBottomInset: false,
@@ -745,6 +717,100 @@ class HomeScreenState extends State<HomeScreen> {
         ],
       ),
     ));
+  }
+
+  Widget getParamPage() {
+    setState(() {
+      // On sauvegarde les pararmètres de la carte
+      SaveMap();
+    });
+    // On envoie sur la page des paramètres
+    return paramCard(
+      isDBLoaded: _isDBLoaded,
+      isTileSetLoaded: _isTileSetLoaded,
+      delDB: () {
+        dbm.delAll();
+        setState(() {
+          // On assigne les points et bénévole
+          ben = [];
+          posPoints = [];
+          // Le bénévole sélectionné est le premier (La croix rouge)
+          _selected = Benevole.empty();
+          // On indique que la base de donnée n'est pas chargée
+          _isDBLoaded = false;
+        });
+      },
+      delMap: () {
+        try {
+          getMapTilepath().then((value) {
+            Directory(value).deleteSync(recursive: true);
+            setState(() {
+              _isTileSetLoaded = false;
+              TileText = "Charger les cartes";
+            });
+          });
+        } catch (e) {
+          setState(() {
+            _isTileSetLoaded = false;
+            TileText = "Charger les cartes";
+          });
+        }
+      },
+      addDB: () {
+        dataFromFile();
+      },
+      addMap: () {
+        MapFromFile();
+      },
+      TileText: TileText,
+    );
+  }
+
+  Widget getBottomBar() {
+    return BottomNavBarFb5(
+          l: [
+            IconBottomBar(
+              text: "Carte",
+              icon: FontAwesomeIcons.mapMarkedAlt,
+              onPressed: () {
+                setState(() {
+                  _page = 0;
+                });
+              },
+              selected: _page == 0,
+            ),
+            IconBottomBar(
+              text: "Bénévole",
+              icon: FontAwesomeIcons.userAlt,
+              onPressed: () {
+                setState(() {
+                  _page = 1;
+                });
+              },
+              selected: _page == 1,
+            ),
+            IconBottomBar(
+              text: "Points",
+              icon: FontAwesomeIcons.mapMarkerAlt,
+              onPressed: () {
+                setState(() {
+                  _page = 2;
+                });
+              },
+              selected: _page == 2,
+            ),
+            IconBottomBar(
+              text: "Paramètres",
+              icon: FontAwesomeIcons.cog,
+              onPressed: () {
+                setState(() {
+                  _page = 3;
+                });
+              },
+              selected: _page == 3,
+            )
+          ],
+        );
   }
 
   FlutterMap _buildMap() {
@@ -854,55 +920,12 @@ class HomeScreenState extends State<HomeScreen> {
       _offlineMapScheme = value + offlinePartMapScheme;
     });
     return Scaffold(
-          // This is handled by the search bar itself.
-          resizeToAvoidBottomInset: false,
-          // On récupère la page sélectionnée
-          body: _getBody(),
-          // La liste des boutons de la barre de navigation
-          bottomNavigationBar: BottomNavBarFb5(
-            l: [
-              IconBottomBar(
-                text: "Carte",
-                icon: FontAwesomeIcons.mapMarkedAlt,
-                onPressed: () {
-                  setState(() {
-                    _page = 0;
-                  });
-                },
-                selected: _page == 0,
-              ),
-              IconBottomBar(
-                text: "Bénévole",
-                icon: FontAwesomeIcons.userAlt,
-                onPressed: () {
-                  setState(() {
-                    _page = 1;
-                  });
-                },
-                selected: _page == 1,
-              ),
-              IconBottomBar(
-                text: "Points",
-                icon: FontAwesomeIcons.mapMarkerAlt,
-                onPressed: () {
-                  setState(() {
-                    _page = 2;
-                  });
-                },
-                selected: _page == 2,
-              ),
-              IconBottomBar(
-                text: "Paramètres",
-                icon: FontAwesomeIcons.cog,
-                onPressed: () {
-                  setState(() {
-                    _page = 3;
-                  });
-                },
-                selected: _page == 3,
-              )
-            ],
-          )
-        );
+        // This is handled by the search bar itself.
+        resizeToAvoidBottomInset: false,
+        // On récupère la page sélectionnée
+        body: _getBody(),
+        // La liste des boutons de la barre de navigation
+        bottomNavigationBar: getBottomBar()
+      );
   }
 }
