@@ -143,23 +143,18 @@ class Point {
   void getCol() {
     /* Renvoie la couleur du point en fonction de son status et de son type
     */
-    // Le point principaux ne changent pas de couleur
-    if (type == 1) {
+    // S'il n'y a personne
+    if (status == 0) {
       col = Constants.personne;
+      // Si au moins un bénévole est arrivé
+    } else if (status == 1) {
+      col = Constants.arrivee;
+      // Si les ouvreurs sont passé
+    } else if (status == 2) {
+      col = Constants.premier;
+      // Si les fermeurs sont passé
     } else {
-      // S'il n'y a personne
-      if (status == 0) {
-        col = Constants.personne;
-        // Si au moins un bénévole est arrivé
-      } else if (status == 1) {
-        col = Constants.arrivee;
-        // Si les ouvreurs sont passé
-      } else if (status == 2) {
-        col = Constants.premier;
-        // Si les fermeurs sont passé
-      } else {
-        col = Constants.dernier;
-      }
+      col = Constants.dernier;
     }
   }
 }

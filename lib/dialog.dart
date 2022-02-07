@@ -63,7 +63,8 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                 widget.title,
                 style: TextStyle(
                   fontSize: 25,
-                  fontWeight: FontWeight.w800
+                  fontWeight: FontWeight.w800,
+                  color: Constants.darkgrad
                 ),
               ),
               // Espace entre le titre et la description
@@ -73,7 +74,10 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
               // La description
               Text(
                 widget.descriptions,
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Constants.dernier,
+                ),
                 textAlign: TextAlign.center,
               ),
               // Espace entre la description et les boutons
@@ -96,7 +100,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                           "Non",
                           style: TextStyle(
                             fontSize: 18,
-                            color: Colors.red.shade600),
+                            color: Constants.samu),
                         )
                       ),
                       // Le bouton "Oui"
@@ -109,7 +113,10 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                         // Le texte sur le bouton
                         child: Text(
                           "Oui",
-                          style: TextStyle(fontSize: 18),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Constants.ben
+                          ),
                         )
                       ),
                     ],

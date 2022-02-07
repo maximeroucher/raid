@@ -37,10 +37,6 @@ class Constants {
   static const Color lightdel = Color(0xffd81159);
   static const Color darkdel = Color(0xffa1051d);
 
-  // Les couleurs des boutons d'ajouts
-  static const Color lightadd = Color(0xff6ae6f4);
-  static const Color darkadd = Color(0xff0482c7);
-
   // La couleur du texte non chargée
   static const Color textnotloaded = Color(0xffdd2476);
 

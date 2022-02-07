@@ -20,6 +20,8 @@ import 'constant.dart';
 import 'bottomBar.dart';
 import 'PointCard.dart';
 import 'paramCard.dart';
+import 'tempsCard.dart';
+import 'equipe.dart';
 import 'lienMissionsBeneveloves.dart';
 
 // Le gestionnaire de toutes les pages et de la page de la carte
@@ -63,6 +65,9 @@ class HomeScreenState extends State<HomeScreen> {
   // Le bénévole affiché sur la page bénévole (par défaut personne)
   Benevole _selected = Benevole.empty();
 
+  // La liste des équipes
+  List<Equipe> eq = [];
+
   // La liste des points
   List<Point> posPoints = [];
   // Le point affiché sur la page des points (par défaut le point en (0, 0))
@@ -76,6 +81,10 @@ class HomeScreenState extends State<HomeScreen> {
 
   // Le controlleur de carte
   MapController _mapController = MapController();
+
+
+  // Par défaut le trail 1
+  String nomEpreuve = "Trail 1";
 
   // Au lancemenent de l'application
   void initState() {
@@ -94,6 +103,14 @@ class HomeScreenState extends State<HomeScreen> {
       setState(() {
         // On les met dans ben
         ben = value;
+
+        // la liste des équipes
+        eq = [
+          Equipe(0, 1, "Nom de l'équipe 1", 1),
+          Equipe(1, 2, "deuxième équipe", 0),
+          Equipe(2, 3, "équipe numéro 3", 3)
+        ];
+
         // S'il n'y en a pas
         if (ben.length == 0) {
           dataFromFile();
@@ -681,6 +698,8 @@ class HomeScreenState extends State<HomeScreen> {
       // Si on est sur la page des paramètres
     } else if (_page == 3) {
       return getParamPage();
+    } else if (_page == 4) {
+      return getTempsPage();
     }
     // Sinon, on est sur la page de la carte
     return getMapPage();
@@ -766,51 +785,71 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget getTempsPage() {
+    // On sauvegarde les pararmètres de la carte
+    setState(() {
+      SaveMap();
+    });
+    print(eq);
+    // On envoie sur la page du point
+    return tempsCard(eq: eq, nomEpreuve: nomEpreuve,);
+  }
+
   Widget getBottomBar() {
     return BottomNavBarFb5(
-          l: [
-            IconBottomBar(
-              text: "Carte",
-              icon: FontAwesomeIcons.mapMarkedAlt,
-              onPressed: () {
-                setState(() {
-                  _page = 0;
-                });
-              },
-              selected: _page == 0,
-            ),
-            IconBottomBar(
-              text: "Bénévole",
-              icon: FontAwesomeIcons.userAlt,
-              onPressed: () {
-                setState(() {
-                  _page = 1;
-                });
-              },
-              selected: _page == 1,
-            ),
-            IconBottomBar(
-              text: "Points",
-              icon: FontAwesomeIcons.mapMarkerAlt,
-              onPressed: () {
-                setState(() {
-                  _page = 2;
-                });
-              },
-              selected: _page == 2,
-            ),
-            IconBottomBar(
-              text: "Paramètres",
-              icon: FontAwesomeIcons.cog,
-              onPressed: () {
-                setState(() {
-                  _page = 3;
-                });
-              },
-              selected: _page == 3,
-            )
-          ],
-        );
+      l: [
+        IconBottomBar(
+          text: "Carte",
+          icon: FontAwesomeIcons.mapMarkedAlt,
+          onPressed: () {
+            setState(() {
+              _page = 0;
+            });
+          },
+          selected: _page == 0,
+        ),
+        IconBottomBar(
+          text: "Bénévole",
+          icon: FontAwesomeIcons.userAlt,
+          onPressed: () {
+            setState(() {
+              _page = 1;
+            });
+          },
+          selected: _page == 1,
+        ),
+        IconBottomBar(
+          text: "Points",
+          icon: FontAwesomeIcons.mapMarkerAlt,
+          onPressed: () {
+            setState(() {
+              _page = 2;
+            });
+          },
+          selected: _page == 2,
+        ),
+        IconBottomBar(
+          text: "Temps",
+          icon: FontAwesomeIcons.stopwatch,
+          onPressed: () {
+            setState(() {
+              _page = 4;
+            });
+          },
+          selected: _page == 4,
+        ),
+        IconBottomBar(
+          text: "Paramètres",
+          icon: FontAwesomeIcons.cog,
+          onPressed: () {
+            setState(() {
+              _page = 3;
+            });
+          },
+          selected: _page == 3,
+        ),
+      ],
+    );
   }
 
   FlutterMap _buildMap() {
@@ -873,7 +912,7 @@ class HomeScreenState extends State<HomeScreen> {
         .map((x) => new Marker(
             point: x.pos,
             width: 80.0,
-            height: 145.0,
+            height: x.type == 0 ? 145.0 : 165,
             builder: (context) => GestureDetector(
                 onTap: () {
                   // Si on clique sur un point, on est redirigé vers la page des points avec le point choisis
@@ -892,7 +931,7 @@ class HomeScreenState extends State<HomeScreen> {
                         style: TextStyle(
                             color: x.col,
                             fontWeight: FontWeight.w900,
-                            fontSize: 15),
+                            fontSize: x.type == 0 ? 15 : 18),
                       ),
                     ),
                     // On affiche l'icône du point, qui dépend du type du point
@@ -901,11 +940,32 @@ class HomeScreenState extends State<HomeScreen> {
                         ? FaIcon(FontAwesomeIcons.mapMarkerAlt,
                             color: x.col, size: 52.0)
                         // Si c'est un point principal
-                        : Image.asset(
-                            'assets/images/ic_marker.png',
+
+                        : Stack(children: [
+                            Center(
+                              child: FaIcon(FontAwesomeIcons.mapMarker,
+                                  color: Colors.grey.shade100, size: 60.0),
+                            ),
+                            Center(
+                                child: Column(
+                              children: [
+                                Container(
+                                  height: 5,
+                                ),
+                                Image.asset(
+                                  'assets/images/logo.png',
+                                  height: 33,
+                                  width: 33,
+                                ),
+                              ],
+                            ))
+                          ])
+                    /*Image.asset(
+                            'assets/images/test2.png',
                             height: 60,
                             width: 60,
                           ),
+                          */
                   ],
                 ))))
         .toList();
@@ -925,7 +985,6 @@ class HomeScreenState extends State<HomeScreen> {
         // On récupère la page sélectionnée
         body: _getBody(),
         // La liste des boutons de la barre de navigation
-        bottomNavigationBar: getBottomBar()
-      );
+        bottomNavigationBar: getBottomBar());
   }
 }

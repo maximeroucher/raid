@@ -77,7 +77,7 @@ class IconBottomBarState extends State<IconBottomBar> {
       onTap: widget.onPressed,
       // la zone cliquable
       child: Container(
-        width: 80,
+        width: 60,
         height: 55,
         // la couleur n'est pas transparente, car sinon la zone n'est plus cliquable
         color: Colors.white.withAlpha(1),

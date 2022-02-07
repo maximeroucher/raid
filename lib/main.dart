@@ -17,27 +17,41 @@ class MyApp extends StatelessWidget {
 
 Json doit changer de nom ou desinstaller app (sinon pb cache)
 
-31/01
 
-Naviagtion
+08/02 : Temps participant
+        -> database (save / chargt / chgt)
+        -> page affichage cpct
+        -> save csv
 
---------------------------------------------------------------------------------
+----
 
-./02
-
-TEST + RÉU° : (Éclair : IOS + autres test)
-
-
-2 pt -> mm endroit (dissocier col + pb db) (normt pas de pb / dmd)
+Pb : imp avoir tte map
 
 
-recep° + pasring msg (dmd)
+A faire : verif nom fichier (fait normt mais pas tester)
+          test (p-ê IOS, voir avec Eclair)
+          Créa° de zip des maps par zone pr Raid apres
+          programme pr crée base de donnée à télécharger
 
 
-page tps participants (dmd avant)
+Possible :
 
--> tps participant + qr code maj
-  (ben ft tps (s/ check box avec tps = tps tel au check) et raidman scan)
+  tps participants :
+    cocher : ++ pas besoin de co
+             ++ moins de perte de temps
+             -- il faut un respo chrono qui coche tlm
+
+    QR Code : ++ plus besoin de Raidman
+              ++ juste besoin de scanner
+              -- juste bénévole avec l'appli
+              -- suret pas prêt pr la challenge
+
+
+  parsing msg + appli benevole :
+    ++ appli pr tlm au raid car pas besoin taper msg à la main
+    ++ pas de pb pr trouver num de qui que ce soit
+    -- tlm doit avoir l'appli + base de données
+
 
 app bénévole (liste mission / liste num autre (msg, tel) / btn arrivée pt / 1er / dernier // page tps participant)
 
