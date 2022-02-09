@@ -6,10 +6,7 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home : HomeScreen()
-    );
+    return MaterialApp(debugShowCheckedModeBanner: false, home: HomeScreen());
   }
 }
 
@@ -17,16 +14,18 @@ class MyApp extends StatelessWidget {
 
 Json doit changer de nom ou desinstaller app (sinon pb cache)
 
+10/02 : => remaping db vers classse
+        != tps pr mm pt (chgt datedebut / fin (tabledate (id ben, nom pt, dadedebut, detafin)))
 
-08/02 : Temps participant
-        -> database (save / chargt / chgt)
-        -> page affichage cpct
-        -> save csv
 
+test IOS
+
+pb : map oline charge qd mm
 ----
 
 Pb : imp avoir tte map
 
+Amélio° : anima°
 
 A faire : verif nom fichier (fait normt mais pas tester)
           test (p-ê IOS, voir avec Eclair)

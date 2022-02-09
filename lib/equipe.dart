@@ -1,6 +1,3 @@
-import 'package:flutter/material.dart';
-import 'constant.dart';
-
 // Le nom de la table dans la base de donnée
 final String tableEquipe = "equipe";
 
@@ -33,8 +30,9 @@ class Equipe {
   int type = 0; // 0 Challenge, 1 débutant, 2 sportif, 3 expert
   // Les temps de l'équipe
   List<Map<String, DateTime>> temps;
+  List<String> ep;
 
-  Equipe(int Id, int Num, String Nom, int Type)
+  Equipe(int Id, int Num, String Nom, int Type, List<String> listeEp)
   /* Crée une équipe avec les paramètres donnés
   */
   {
@@ -42,51 +40,54 @@ class Equipe {
     num = Num;
     nom = Nom;
     type = Type;
+    ep = listeEp;
     // Aucun temps n'est enregistré par défaut
-    temps = [
-      {
-        "Trail 1": null,
-        "Trail 2": null,
-        "VTT 1": null,
-        "VTT 2": null,
-        "Run & Bike": null,
-      },
-            {
-        "Trail 1": null,
-        "Trail 2": null,
-        "VTT 1": null,
-        "VTT 2": null,
-        "Run & Bike": null,
-      }
-    ];
+    temps = [genTable(0), genTable(1)];
+  }
+
+  Map<String, DateTime> genTable(int type) {
+    Map<String, DateTime> resp = {};
+    this.ep.map((e) => resp[e] = null).toList();
+    return resp;
   }
 
   // Crée une équipe vide (pour éviter des erreurs d'objet non défini)
   Equipe.empty() {}
 
-  static Equipe fromJson(Map<String, Object> json) =>
-      /* Crée une équipe avec les paramètres donnés au format dictionnaire
-  */
-      Equipe(
+  static Equipe fromJson(Map<String, Object> json, List<String> listeEp) { TODO: 
+    /* Crée une équipe avec les paramètres donnés au format dictionnaire
+    */
+    Equipe e = Equipe(
         json[EquipeFields.id] as int,
         json[EquipeFields.num] as int,
         json[EquipeFields.nom] as String,
         json[EquipeFields.type] as int,
-      );
+        listeEp);
 
-  Map<String, Object> toJson() =>
-      // Transforme une équipe en dicionnaire
-      {
-        EquipeFields.id: id,
-        EquipeFields.num: num,
-        EquipeFields.nom: nom,
-        EquipeFields.type: type,
-      };
+    return e;
+  }
 
-  Equipe copy({int id, int num, String nom, int type}) =>
+  Map<String, Object> toJson() {
+    // Transforme une équipe en dicionnaire
+    Map<String, Object> resp = {
+      EquipeFields.id: id,
+      EquipeFields.num: num,
+      EquipeFields.nom: nom,
+      EquipeFields.type: type,
+    };
+    for (int x = 0; x < this.temps.length; x++) {
+      for (String s in this.ep) {
+        resp[(s + x.toString()).replaceAll(" ", "_").replaceAll("&", "\$")] =
+            this.temps[x][s].toString();
+      }
+    }
+    return resp;
+  }
+
+  Equipe copy({int id, int num, String nom, int type, List<String> listeEp}) =>
       // Copie l'équipe en changeant les données données
-      Equipe(
-          id ?? this.id, num ?? this.num, nom ?? this.nom, type ?? this.type);
+      Equipe(id ?? this.id, num ?? this.num, nom ?? this.nom, type ?? this.type,
+          listeEp ?? this.ep);
 
   String getTypeString() {
     /* Retourne le texte associé au type de course

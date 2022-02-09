@@ -82,9 +82,10 @@ class HomeScreenState extends State<HomeScreen> {
   // Le controlleur de carte
   MapController _mapController = MapController();
 
-
-  // Par défaut le trail 1
-  String nomEpreuve = "Trail 1";
+  // l'épreuve chronométrée
+  String nomEpreuve = "";
+  // La liste des épreuves chronométrées
+  List<String> listeEpreuves = [];
 
   // Au lancemenent de l'application
   void initState() {
@@ -104,13 +105,6 @@ class HomeScreenState extends State<HomeScreen> {
         // On les met dans ben
         ben = value;
 
-        // la liste des équipes
-        eq = [
-          Equipe(0, 1, "Nom de l'équipe 1", 1),
-          Equipe(1, 2, "deuxième équipe", 0),
-          Equipe(2, 3, "équipe numéro 3", 3)
-        ];
-
         // S'il n'y en a pas
         if (ben.length == 0) {
           dataFromFile();
@@ -123,13 +117,21 @@ class HomeScreenState extends State<HomeScreen> {
           _point = posPoints[0];
           // Le centre est la position du premier point
           _center = _point.pos;
+          // On récupère la liste des épreuves
+          dbm.getEpreuve().then((value) => setState(() {
+                listeEpreuves = value;
+                nomEpreuve = listeEpreuves[0];
+              }));
+          // On récupère la liste de équipes
+          dbm.readAllEquipe(listeEpreuves).then((value) => setState(() {
+                eq = value;
+              }));
         }
       });
     });
   }
 
   void dataFromFile() {
-    //TODO: vérif bon fichier
     /* Génère la base de donnée à partir d'un fichier
     */
     try {
@@ -141,9 +143,12 @@ class HomeScreenState extends State<HomeScreen> {
             // On indique que la base de donnée est chargée
             _isDBLoaded = true;
           });
-          // On assigne les points et bénévole
+          // On assigne les points, bénévoles, équipes et épreuves
           ben = value[0];
           posPoints = value[1];
+          eq = value[2];
+          listeEpreuves = value[3];
+          nomEpreuve = listeEpreuves[0];
           // Le bénévole sélectionné est le premier (La croix rouge)
           _selected = ben[0];
           // le point sélectionné est le preimer
@@ -376,9 +381,19 @@ class HomeScreenState extends State<HomeScreen> {
         // On ajoute le bénévole
         ben.add(b);
       }
-      return [ben, posPoints];
+      listeEpreuves = [];
+      // La liste des épreuves
+      for (int x = 0; x < data["epreuves"].length; x++) {
+        listeEpreuves.add(data["epreuves"][x] as String);
+      }
+      // la liste des équipes
+      eq = [];
+      for (int x = 0; x < data["equipe"].length; x++) {
+        eq.add(Equipe.fromJson(data["equipe"][x], listeEpreuves));
+      }
+      return [ben, posPoints, eq, listeEpreuves];
     }
-    return [];
+    return [[], [], [], []];
   }
 
   Future<void> parseMap(FilePickerResult r) async {
@@ -502,6 +517,11 @@ class HomeScreenState extends State<HomeScreen> {
     for (Benevole b in ben) {
       // On l'ajoute à la base de donnée
       await dbm.createBenevole(b);
+    }
+    print(eq[0].toJson());
+    dbm.createEquipetable(eq[0]);
+    for (Equipe e in eq) {
+      await dbm.createEquipe(e);
     }
   }
 
@@ -790,9 +810,13 @@ class HomeScreenState extends State<HomeScreen> {
     setState(() {
       SaveMap();
     });
-    print(eq);
     // On envoie sur la page du point
-    return tempsCard(eq: eq, nomEpreuve: nomEpreuve,);
+    return tempsCard(
+      eq: eq,
+      nomEpreuve: nomEpreuve,
+      epreuves: listeEpreuves,
+      db: dbm,
+    );
   }
 
   Widget getBottomBar() {

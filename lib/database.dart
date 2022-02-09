@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 
 import 'point.dart';
 import 'benevole.dart';
+import 'equipe.dart';
 import 'lienMissionsBeneveloves.dart';
 
 // le gestionnaire de base de donnée
@@ -16,6 +17,12 @@ class DatabaseManager {
   static Database _database;
 
   static final String filePath = 'database.db';
+
+  // La conversion des types dart en type SQL
+  final idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+  final intType = 'INTEGER NOT NULL';
+  final stringType = 'TEXT NOT NULL';
+  final doubleType = 'REAL NOT NULL';
 
   // Récupère la base de donnée si elle ne l'était pas déjà
   Future<Database> get database async => _database ??= await _initDB();
@@ -36,11 +43,6 @@ class DatabaseManager {
   Future _createDB(Database db, int version) async {
     /* Crée les tables dans la base de donnée
     */
-    // La conversion des types dart en type SQL
-    final idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
-    final intType = 'INTEGER NOT NULL';
-    final stringType = 'TEXT NOT NULL';
-    final doubleType = 'REAL NOT NULL';
 
     // Crée la table des bénévoles
     await db.execute('''
@@ -80,11 +82,55 @@ class DatabaseManager {
     ''');
   }
 
+  void createEquipetable(Equipe e) async {
+    final db = await instance.database;
+    final json = e.toJson();
+    String cmd = '''
+    CREATE TABLE IF NOT EXISTS $tableEquipe (
+        ${EquipeFields.id} $idType,
+        ${EquipeFields.nom} $stringType,
+        ${EquipeFields.num} $intType,
+        ${EquipeFields.type} $intType''';
+    final k = ["id", "num", "nom", "type"];
+    for (String s in json.keys) {
+      if (!k.contains(s)) {
+        cmd += ''',\n''';
+        cmd += '''$s $stringType''';
+      }
+    }
+
+    cmd += ''');''';
+    // Créer la table des équipes
+    await db.execute(cmd);
+  }
+
   Future close() async {
     /* Ferme la base de donnée
     */
     final db = await instance.database;
     db.close();
+  }
+
+  Future<List<String>> getEpreuve() async {
+    /* Retourne la lsite des épreuves contenue dans la base de données
+    result :
+          - Future<List<String>>
+    */
+    // La base de donnée
+    final db = await instance.database;
+    final r = await db.rawQuery('''
+      SELECT * FROM $tableEquipe LIMIT 1
+      ''');
+    var l = r[0].keys.toList().sublist(4);
+    List<String> resp = [];
+    for (int x = 0; x < l.length / 2; x++) {
+      String s = l[x]
+          .replaceAll("_", " ")
+          .replaceAll("\$", "&")
+          .substring(0, l[x].length - 1);
+      resp.add(s);
+    }
+    return resp.toList();
   }
 
   Future<List<Benevole>> readAllBenevoles() async {
@@ -126,6 +172,34 @@ class DatabaseManager {
     return r;
   }
 
+  Future<List<Equipe>> readAllEquipe(List<String> listeEp) async {
+    /* Lis toutes les équipes de la base de donnée
+    result :
+          - Future<List<Equipe>>
+    */
+    // La base de donnée
+    final db = await instance.database;
+    // Pour ordonner les résultats
+    final orderBy = '${EquipeFields.id}';
+    // On récupère toutes les équipes de la base de donnée
+    final result = await db.query(tableEquipe, orderBy: orderBy);
+    // On transforme le résultat de la requête en liste d'équipe
+    return result.map((e) => Equipe.fromJson(e, listeEp)).toList();
+  }
+
+  Future<int> updateEquipe(Equipe e) async {
+    /* Met à jour l'équipe
+    param :
+          - p (Point)
+
+    result :
+          - Future<int>
+    */
+    final db = await instance.database;
+    return db.update(tableBenevole, e.toJson(),
+        where: '${EquipeFields.id} = ?', whereArgs: [e.id]);
+  }
+
   Future<int> updateBenevole(Benevole b) async {
     /* Met à jour les informations du bénévole
     param :
@@ -139,6 +213,19 @@ class DatabaseManager {
         where: '${BenevoleFields.id} = ?', whereArgs: [b.id]);
   }
 
+  Future<int> updatePoint(Point p) async {
+    /* Met à jour le point
+    param :
+          - p (Point)
+
+    result :
+          - Future<int>
+    */
+    final db = await instance.database;
+    return db.update(tablePoint, p.toJson(),
+        where: '${PointFields.id} = ?', whereArgs: [p.id]);
+  }
+
   Future<Benevole> createBenevole(Benevole b) async {
     /* Ajoute un bénévole à la base de donnée
     pararm :
@@ -150,14 +237,7 @@ class DatabaseManager {
     final db = await instance.database;
     // On transforme le bénévole en dictionnaire
     final json = b.toJson();
-    // On génère les colonnes et valeurs de la commande SQL
-    final columns =
-        '${BenevoleFields.nom}, ${BenevoleFields.surnom}, ${BenevoleFields.num}, ${BenevoleFields.type}, ${BenevoleFields.indexMission}, ${BenevoleFields.statusMission}';
-    final values =
-        '"${json[BenevoleFields.nom]}", "${json[BenevoleFields.surnom]}", "${json[BenevoleFields.num]}", ${json[BenevoleFields.type]}, ${json[BenevoleFields.indexMission]}, ${json[BenevoleFields.statusMission]}';
-    // On lance la commande SQL d'ajout du bénévole
-    final id = await db
-        .rawInsert("INSERT INTO $tableBenevole ($columns) VALUES ($values)");
+    final id = await db.insert(tableBenevole, json);
     List<Point> points = [];
     // Pour chaque point
     for (Point p in b.missions) {
@@ -183,14 +263,7 @@ class DatabaseManager {
       } else {
         // On transforme le point en dicitonnaire
         final json = p.toJson();
-        // On génère les colonnes et valeurs de la commande SQL
-        final columns =
-            '${PointFields.lat}, ${PointFields.long}, ${PointFields.nom}, ${PointFields.type}, ${PointFields.type}, ${PointFields.status}, ${PointFields.dateDebut}, ${PointFields.dateFin}, ${PointFields.numOnPoint}, ${PointFields.pointPrec}';
-        final values =
-            '${json[PointFields.lat]}, ${json[PointFields.long]}, "${json[PointFields.nom]}", ${json[PointFields.type]}, ${json[PointFields.type]}, ${json[PointFields.status]}, "${json[PointFields.dateDebut]}", "${json[PointFields.dateFin]}", ${json[PointFields.numOnPoint]}, "${json[PointFields.pointPrec]}"';
-        // On lance la commande SQL d'ajout du point
-        Pid = await db
-            .rawInsert("INSERT INTO $tablePoint ($columns) VALUES ($values)");
+        Pid = await db.insert(tablePoint, json);
       }
       // On présice le point dans le lien
       l.mission = Pid;
@@ -198,15 +271,25 @@ class DatabaseManager {
       points.add(p.copy(id: Pid));
       // On transforme le lien en dicitonnaire
       final json = l.toJson();
-      // On génère les colonnes et valeurs de la commande SQL
-      final Pcolumns = '${LienFields.ben}, ${LienFields.mission}';
-      final Pvalues = '${json[LienFields.ben]}, ${json[LienFields.mission]}';
-      // On lance la commande SQL d'ajout du lien
-      await db
-          .rawInsert("INSERT INTO $tableLien ($Pcolumns) VALUES ($Pvalues)");
+      await db.insert(tableLien, json);
     }
     // On met à jour le bénévole avec les missions et l'identifiant qui collent à ceux de la base de donnée
     return b.copy(id: id, missions: points);
+  }
+
+  Future<void> createEquipe(Equipe e) async {
+    /* Ajoute une équipe à la base de donnée
+    pararm :
+          - e (Equipe)
+
+    result :
+          - Future<Equipe>
+    */
+    // La base de donnée
+    final db = await instance.database;
+    // On transforme le bénévole en dictionnaire
+    final json = e.toJson();
+    db.insert(tableEquipe, json);
   }
 
   Future<bool> isNotEmpty() async {
@@ -228,18 +311,6 @@ class DatabaseManager {
     await db.execute("DELETE FROM $tableBenevole");
     await db.execute("DELETE FROM $tableLien");
     await db.execute("DELETE FROM $tablePoint");
-  }
-
-  Future<int> updatePoint(Point p) async {
-    /* Met à jour la point
-    param :
-          - p (Point)
-
-    result :
-          - Future<int>
-    */
-    final db = await instance.database;
-    return db.update(tablePoint, p.toJson(),
-        where: '${PointFields.id} = ?', whereArgs: [p.id]);
+    await db.execute("DELETE FROM $tableEquipe");
   }
 }

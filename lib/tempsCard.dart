@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:raidmap/constant.dart';
 import 'package:custom_check_box/custom_check_box.dart';
@@ -7,26 +9,24 @@ import 'dialog.dart';
 import 'constant.dart';
 import 'customPainter.dart';
 import 'equipe.dart';
+import 'database.dart';
 
 // La page des paramètres
 class tempsCard extends StatefulWidget {
   // Les différentes épreuves possibles
-  List<String> epreuves = [
-    "Trail 1",
-    "Trail 2",
-    "VTT 1",
-    "VTT 2",
-    "Run & Bike"
-  ];
+  List<String> epreuves = [];
   // la liste des équipes
   List<Equipe> eq;
   // Le nom de l'épreuve actuelle
   String nomEpreuve = "";
+  // la base de donnée
+  DatabaseManager db;
 
   // Le type de temps (0 = départ, 1 =  arrivé)
   int type = 0;
 
-  tempsCard({Key key, this.eq, this.nomEpreuve}) : super(key: key);
+  tempsCard({Key key, this.eq, this.nomEpreuve, this.epreuves, this.db})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => tempsCardState();
@@ -119,25 +119,15 @@ class tempsCardState extends State<tempsCard> {
                                         children: widget.epreuves
                                             .map((e) => SimpleDialogOption(
                                                   child: Container(
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Container(
-                                                          width: 20,
-                                                        ),
-                                                        Text(
-                                                          e,
-                                                          style: TextStyle(
-                                                            fontSize: 18,
-                                                            color: Constants
-                                                                .lightgrad,
-                                                            fontWeight:
-                                                                FontWeight.w800,
-                                                          ),
-                                                        ),
-                                                      ],
+                                                    child: Text(
+                                                      e,
+                                                      style: TextStyle(
+                                                        fontSize: 18,
+                                                        color:
+                                                            Constants.lightgrad,
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                      ),
                                                     ),
                                                   ),
                                                   // On change le nom quand on clique dessus et on ferme la fenêtre
@@ -283,12 +273,42 @@ class tempsCardState extends State<tempsCard> {
             ),
             // La liste des équipes
             Column(
-                children: widget.eq.map((e) {
+                children: sort().map((e) {
               int i = widget.eq.indexOf(e);
               return buildCard(e, i);
             }).toList())
           ],
         )));
+  }
+
+  List<Equipe> sort() {
+    widget.eq.sort((a, b) => compare(a, b));
+    return widget.eq;
+  }
+
+  int compare(Equipe a, Equipe b) {
+    bool astopped = a.temps[widget.type][widget.nomEpreuve] != null;
+    bool bstopped = b.temps[widget.type][widget.nomEpreuve] != null;
+    if (astopped) {
+      if (bstopped) {
+        if (a.num < b.num) {
+          return -1;
+        } else {
+          return 1;
+        }
+      }
+      return 1;
+    } else {
+      if (bstopped) {
+        return -1;
+      } else {
+        if (a.num < b.num) {
+          return -1;
+        } else {
+          return 1;
+        }
+      }
+    }
   }
 
   Widget buildCard(Equipe e, int i) {
@@ -396,15 +416,18 @@ class tempsCardState extends State<tempsCard> {
                               // Le temps
                               Text(
                                 stopped
-                                    ? e.temps[widget.type][widget.nomEpreuve].hour
+                                    ? e.temps[widget.type][widget.nomEpreuve]
+                                            .hour
                                             .toString()
                                             .padLeft(2, '0') +
                                         ":" +
-                                        e.temps[widget.type][widget.nomEpreuve].minute
+                                        e.temps[widget.type][widget.nomEpreuve]
+                                            .minute
                                             .toString()
                                             .padLeft(2, '0') +
                                         ":" +
-                                        e.temps[widget.type][widget.nomEpreuve].second
+                                        e.temps[widget.type][widget.nomEpreuve]
+                                            .second
                                             .toString()
                                             .padLeft(2, '0')
                                     : "",
@@ -445,13 +468,19 @@ class tempsCardState extends State<tempsCard> {
                                         onYes: () {
                                           setState(() {
                                             // On supprime le temps
-                                            e.temps[widget.type][widget.nomEpreuve] = null;
+                                            e.temps[widget.type]
+                                                [widget.nomEpreuve] = null;
+                                            widget.db.updateEquipe(e);
+                                            sleep(Duration(milliseconds: 100));
                                           });
                                         }));
                           } else {
                             setState(() {
-                              // ON ajoute le temps
-                              e.temps[widget.type][widget.nomEpreuve] = DateTime.now();
+                              // On ajoute le temps
+                              e.temps[widget.type][widget.nomEpreuve] =
+                                  DateTime.now();
+                              widget.db.updateEquipe(e);
+                              sleep(Duration(milliseconds: 100));
                             });
                           }
                         },
