@@ -54,7 +54,7 @@ class Equipe {
   // Crée une équipe vide (pour éviter des erreurs d'objet non défini)
   Equipe.empty() {}
 
-  static Equipe fromJson(Map<String, Object> json, List<String> listeEp) { TODO: 
+  static Equipe fromJson(Map<String, Object> json, List<String> listeEp) {
     /* Crée une équipe avec les paramètres donnés au format dictionnaire
     */
     Equipe e = Equipe(
@@ -63,7 +63,18 @@ class Equipe {
         json[EquipeFields.nom] as String,
         json[EquipeFields.type] as int,
         listeEp);
-
+    for (String key in json.keys) {
+      if (!EquipeFields.values.contains(key)) {
+        var ckey = key.replaceAll("_", " ").replaceAll("\$", "&");
+        int pos = int.parse(ckey.substring(ckey.length - 1));
+        String ep = ckey.substring(0, ckey.length - 1);
+        if (json[key] != "null") {
+          e.temps[pos][ep] = DateTime.parse(json[key] as String);
+        } else {
+          e.temps[pos][ep] = null;
+        }
+      }
+    }
     return e;
   }
 
@@ -76,7 +87,7 @@ class Equipe {
       EquipeFields.type: type,
     };
     for (int x = 0; x < this.temps.length; x++) {
-      for (String s in this.ep) {
+      for (String s in this.temps[x].keys) {
         resp[(s + x.toString()).replaceAll(" ", "_").replaceAll("&", "\$")] =
             this.temps[x][s].toString();
       }

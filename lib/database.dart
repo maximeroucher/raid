@@ -28,10 +28,12 @@ class DatabaseManager {
   Future<Database> get database async => _database ??= await _initDB();
 
   Future<Database> _initDB() async {
-    /* Ouvre la base de donnée
-    result :
-          - Future<Database>
-    */
+    /**
+     * Ouvre la base de donnée
+     *
+     * result :
+     *     - Future<Database>
+     */
     // On récupère le chemin vers la base de donné
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
@@ -41,7 +43,12 @@ class DatabaseManager {
   }
 
   Future _createDB(Database db, int version) async {
-    /* Crée les tables dans la base de donnée
+    /**
+     * Crée les tables dans la base de donnée
+     *
+     * param :
+     *     - db (Database)
+     *     - version (int)
     */
 
     // Crée la table des bénévoles
@@ -83,39 +90,54 @@ class DatabaseManager {
   }
 
   void createEquipetable(Equipe e) async {
+    /**
+     * Crée la table pour les équipes
+     *
+     * param :
+     *     - e (Equipe)
+     */
     final db = await instance.database;
+    // On transforme l'équipe en dictionnaire
     final json = e.toJson();
+    // Le début de la commande SQL
     String cmd = '''
     CREATE TABLE IF NOT EXISTS $tableEquipe (
         ${EquipeFields.id} $idType,
         ${EquipeFields.nom} $stringType,
         ${EquipeFields.num} $intType,
         ${EquipeFields.type} $intType''';
+    // Les colonnes déjà dans la commande
     final k = ["id", "num", "nom", "type"];
+    // On regarde les différentes colonnes crée pour l'équipe
     for (String s in json.keys) {
+      // Si elle n'est pas dans les 4 déjà ajoutées
       if (!k.contains(s)) {
+        // On ajoute cette colonne à la commande
         cmd += ''',\n''';
         cmd += '''$s $stringType''';
       }
     }
-
+    // On termine la commande
     cmd += ''');''';
     // Créer la table des équipes
     await db.execute(cmd);
   }
 
   Future close() async {
-    /* Ferme la base de donnée
-    */
+    /**
+     * Ferme la base de donnée
+     */
     final db = await instance.database;
     db.close();
   }
 
   Future<List<String>> getEpreuve() async {
-    /* Retourne la lsite des épreuves contenue dans la base de données
-    result :
-          - Future<List<String>>
-    */
+    /**
+     * Retourne la lsite des épreuves contenue dans la base de données
+     *
+     * result :
+     *     - Future<List<String>>
+     */
     // La base de donnée
     final db = await instance.database;
     final r = await db.rawQuery('''
@@ -134,10 +156,12 @@ class DatabaseManager {
   }
 
   Future<List<Benevole>> readAllBenevoles() async {
-    /* Lis tous les bénévoles de la base de donnée
-    result :
-          - Future<List<Benevole>>
-    */
+    /**
+     * Lis tous les bénévoles de la base de donnée
+     *
+     * result :
+     *     - Future<List<Benevole>>
+     */
     // La base de donnée
     final db = await instance.database;
     // Pour ordonner les résultats
@@ -173,10 +197,11 @@ class DatabaseManager {
   }
 
   Future<List<Equipe>> readAllEquipe(List<String> listeEp) async {
-    /* Lis toutes les équipes de la base de donnée
-    result :
-          - Future<List<Equipe>>
-    */
+    /**
+     * Lis toutes les équipes de la base de donnée
+     * result :
+     *     - Future<List<Equipe>>
+     */
     // La base de donnée
     final db = await instance.database;
     // Pour ordonner les résultats
@@ -188,52 +213,60 @@ class DatabaseManager {
   }
 
   Future<int> updateEquipe(Equipe e) async {
-    /* Met à jour l'équipe
-    param :
-          - p (Point)
-
-    result :
-          - Future<int>
-    */
+    /**
+     * Met à jour l'équipe
+     *
+     * param :
+     *     - p (Point)
+     *
+     * result :
+     *     - Future<int>
+     */
     final db = await instance.database;
-    return db.update(tableBenevole, e.toJson(),
+    return db.update(tableEquipe, e.toJson(),
         where: '${EquipeFields.id} = ?', whereArgs: [e.id]);
   }
 
   Future<int> updateBenevole(Benevole b) async {
-    /* Met à jour les informations du bénévole
-    param :
-          - b (Benevole)
-
-    result :
-          - Future<int> l'identifiant du bénévole
-    */
+    /**
+     * Met à jour les informations du bénévole
+     *
+     * param :
+     *     - b (Benevole)
+     *
+     * result :
+     *     - Future<int> l'identifiant du bénévole
+     */
     final db = await instance.database;
     return db.update(tableBenevole, b.toJson(),
         where: '${BenevoleFields.id} = ?', whereArgs: [b.id]);
   }
 
   Future<int> updatePoint(Point p) async {
-    /* Met à jour le point
-    param :
-          - p (Point)
-
-    result :
-          - Future<int>
-    */
+    /**
+     * Met à jour le point
+     *
+     * param :
+     *     - p (Point)
+     *
+     * result :
+     *     - Future<int>
+     */
     final db = await instance.database;
     return db.update(tablePoint, p.toJson(),
         where: '${PointFields.id} = ?', whereArgs: [p.id]);
   }
 
   Future<Benevole> createBenevole(Benevole b) async {
-    /* Ajoute un bénévole à la base de donnée
-    pararm :
-          - b (Benevole)
-
-    result :
-          - Future<Benevole>
-    */
+    /**
+     * Ajoute un bénévole à la base de donnée
+     *
+     * pararm :
+     *     - b (Benevole)
+     *
+     * result :
+     *     - Future<Benevole>
+     */
     final db = await instance.database;
     // On transforme le bénévole en dictionnaire
     final json = b.toJson();
@@ -278,13 +311,15 @@ class DatabaseManager {
   }
 
   Future<void> createEquipe(Equipe e) async {
-    /* Ajoute une équipe à la base de donnée
-    pararm :
-          - e (Equipe)
-
-    result :
-          - Future<Equipe>
-    */
+    /**
+     * Ajoute une équipe à la base de donnée
+     *
+     * pararm :
+     *     - e (Equipe)
+     *
+     * result :
+     *     - Future<Equipe>
+     */
     // La base de donnée
     final db = await instance.database;
     // On transforme le bénévole en dictionnaire
@@ -293,20 +328,24 @@ class DatabaseManager {
   }
 
   Future<bool> isNotEmpty() async {
-    /* Vérifie que la base de donnée n'est pas vide
-    result :
-          - Future<bool>
-    */
+    /**
+     * Vérifie que la base de donnée n'est pas vide
+     *
+     * result :
+     *     - Future<bool>
+     */
     final db = await instance.database;
     var r = await db.rawQuery("SELECT * FROM $tableBenevole");
     return r.length != 0;
   }
 
   Future<void> delAll() async {
-    /* Supprime toutes les tablee de la base de donnée
-    result :
-          - Future<void>
-    */
+    /**
+     * Supprime toutes les tablee de la base de donnée
+     *
+     * result :
+     *     - Future<void>
+     */
     final db = await instance.database;
     await db.execute("DELETE FROM $tableBenevole");
     await db.execute("DELETE FROM $tableLien");
