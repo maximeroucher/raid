@@ -132,8 +132,9 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   void dataFromFile() {
-    /* Génère la base de donnée à partir d'un fichier
-    */
+    /**
+     * Génère la base de donnée à partir d'un fichier
+     */
     try {
       // On demande de séléctionner le fichier de la base de donnée
       pickFile().then((r) {
@@ -167,9 +168,9 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   void MapFromFile() {
-    //TODO: vérif bon fichier
-    /* Génère la base de donnée à partir d'un fichier
-    */
+    /**
+     * Génère la base de donnée à partir d'un fichier
+     */
     try {
       // On demande de séléctionner le fichier zip des cartes
       pickFile().then((r) {
@@ -184,8 +185,9 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   void updateDBStatus() {
-    /* Met à jour la valeur de _isDBLoaded
-    */
+    /**
+     * Met à jour la valeur de _isDBLoaded
+     */
     // On regarde si la base de donnée n'est pas vide
     dbm.isNotEmpty().then((value) {
       setState(() => _isDBLoaded = value);
@@ -193,8 +195,9 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   void updateTileStatus() {
-    /* Met à jour la valeur de _isDBLoaded
-    */
+    /**
+     * Met à jour la valeur de _isDBLoaded
+     */
     // On récupère le nom du dossier des cartes
     getMapTilepath().then((value) {
       // On regarde si le dossier des cartes existe
@@ -209,13 +212,15 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   List<Point> InitPoints(List<Benevole> ben) {
-    /* Récupère la liste des points
-    param :
-          - ben (List<Benevole>) la liste des bénévoles
-
-    result :
-          - List<Point>
-    */
+    /**
+     * Récupère la liste des points
+     *
+     * param :
+     *     - ben (List<Benevole>) la liste des bénévoles
+     *
+     * result :
+     *     - List<Point>
+     */
     List<Point> resp = [];
     // On regarde les noms, car les objets peuvent avoir les mêmes données sans être égaux
     List<String> noms = [];
@@ -235,8 +240,9 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   void SaveMap() {
-    /* Sauvegarde l'état de l'affichage de la carte
-    */
+    /**
+     * Sauvegarde l'état de l'affichage de la carte
+     */
     // Si la carte est chargée
     if (_isMapReady) {
       // On enregistre le zoom, le centre et la rotation
@@ -253,10 +259,12 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   List<Polyline> getPolyLines() {
-    /* Crée les lignes reliant les points
-    result :
-          - List<Polyline>
-    */
+    /**
+     * Crée les lignes reliant les points
+     *
+     * result :
+     *     - List<Polyline>
+     */
     List<Polyline> list = [];
     // Pour chaque point
     for (Point p in posPoints) {
@@ -273,10 +281,12 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Point findPoint(String nom) {
-    /* Renvoie le point dont on donne le nom
-    result :
-          - Point
-    */
+    /**
+     * Renvoie le point dont on donne le nom
+     *
+     * result :
+     *     - Point
+     */
     // Pour chaque point
     for (Point p in posPoints) {
       // Si ce point est celui qu'on cherche
@@ -288,13 +298,15 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   List<Widget> buildResp(List<Benevole> lb) {
-    /* Renvoie la liste des widget des résultats de la recherche
-    param :
-          - lb (List<Benevole>) la liste des résultats de la recherche
-
-    result :
-          - List<Widget>
-    */
+    /**
+     * Renvoie la liste des widget des résultats de la recherche
+     *
+     * param :
+     *     - lb (List<Benevole>) la liste des résultats de la recherche
+     *
+     * result :
+     *     - List<Widget>
+     */
     // S'il y des résultats
     if (lb.length > 0) {
       List<Widget> resp = [];
@@ -318,18 +330,28 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Future<FilePickerResult> pickFile() async {
-    /* Ouvre une fenêtre d'exploration de fichier et retourne le fichier choisis
-    */
+    /**
+     * Ouvre une fenêtre d'exploration de fichier et retourne le fichier choisis
+     *
+     * result :
+     *     - Future<FilePickerResult>
+     */
     FilePickerResult result = await FilePicker.platform.pickFiles();
+    // Évite les erreurs où result est null
     FilePickerResult r = result ?? FilePickerResult([]);
     return r;
   }
 
   Future<List> parseDB(FilePickerResult r) async {
-    /* Reconstruit la base de donnée d'après le fichier donné
-    param :
-          - r (FilePickerResult) le résultat de la demande de fichier
-    */
+    /**
+     * Reconstruit la base de donnée d'après le fichier donné
+     *
+     * param :
+     *     - r (FilePickerResult) le résultat de la demande de fichier
+     *
+     * result :
+     *     - Future<List>
+     */
     // Si il y a une réponse
     if (r != null) {
       // On récupère le fichier on le lit et on le décode
@@ -381,8 +403,8 @@ class HomeScreenState extends State<HomeScreen> {
         // On ajoute le bénévole
         ben.add(b);
       }
-      listeEpreuves = [];
       // La liste des épreuves
+      listeEpreuves = [];
       for (int x = 0; x < data["epreuves"].length; x++) {
         listeEpreuves.add(data["epreuves"][x] as String);
       }
@@ -397,6 +419,15 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> parseMap(FilePickerResult r) async {
+    /**
+     * Récupère les cartes depuis le fichier .zip
+     *
+     * param :
+     *     - r (FilePickerResult) le résultat de la demande de fichier
+     *
+     * result :
+     *     - Future<void>
+     */
     // On indique que l'on décompresse le fichier
     setState(() {
       TileText = "Décompression";
@@ -459,18 +490,25 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Future<String> getMapTilepath() async {
+    /**
+     * Récupère le chemin d'accès aux cartes
+     *
+     * result :
+     *     - Future<String>
+     */
     Directory appDocDirectory = await getApplicationDocumentsDirectory();
     return appDocDirectory.path + '/map/';
   }
 
   String formatDate(String dd) {
-    /* Transforme le texte représentant la date en un texte compréhenssible pour DateTime
-    param :
-          - dd (String)
-
-    result :
-          - (String) la date modifiée
-    */
+    /**
+     * Transforme le texte représentant la date en un texte compréhenssible pour DateTime
+     * param :
+     *     - dd (String)
+     *
+     * result :
+     *     - String, la date modifiée
+     */
     var d1 = dd.split(" ")[0].split("-");
     var d2 = dd.split(" ")[1].split("-");
     return DateTime(int.parse(d1[0]), int.parse(d1[1]), int.parse(d1[2]),
@@ -479,10 +517,12 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   void updateSearch(String query) {
-    /* Récupère les réponses potentielles à la recherche
-    param :
-          - query (String) la recherche
-    */
+    /**
+     * Récupère les réponses potentielles à la recherche
+     *
+     * param :
+     *     - query (String) la recherche
+     */
     // Si la recherche est vide, toute réponse convient
     if (query.isEmpty) {
       setState(() {
@@ -511,25 +551,30 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   void Genben() async {
-    /* Génère la base de donnée
-    */
+    /**
+     * Génère la base de donnée
+     */
     // Pour chaque bénévole
     for (Benevole b in ben) {
       // On l'ajoute à la base de donnée
       await dbm.createBenevole(b);
     }
-    print(eq[0].toJson());
+    // On crée la table dans la base de donnée
     dbm.createEquipetable(eq[0]);
+    // Pour chaque équipe
     for (Equipe e in eq) {
+      // On l'ajoute à la base de donnée
       await dbm.createEquipe(e);
     }
   }
 
   Widget buildFloatingSearchBar() {
-    /* Crée la barre de recherche
-    result :
-          - FloatingSearchBar(Widget)
-    */
+    /**
+     * Crée la barre de recherche
+     *
+     * result :
+     *     - Widget
+     */
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
 
@@ -594,12 +639,14 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget getSuggestion(Benevole b) {
-    /* Crée la carte de bénévole
-    param :
-          - b (Benevole) le bénévole dont on veut crée la carte
-
-    restult :
-          - Container(Widget)
+    /**
+     * Crée la carte de bénévole
+     *
+     * param :
+     *     - b (Benevole) le bénévole dont on veut crée la carte
+     *
+     * restult :
+     *     - Widget
     */
     return Container(
       decoration: BoxDecoration(
@@ -705,10 +752,12 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _getBody() {
-    /* Renvoie la page sur laquelle on est
-    result :
-          - Container(Widget)
-    */
+    /**
+     * Renvoie la page sur laquelle on est
+     *
+     * result :
+     *     - Widget
+     */
     // Si on est sur la page bénévole
     if (_page == 1) {
       return getBenPage();
@@ -726,6 +775,12 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget getBenPage() {
+    /**
+     * Génère la page d'un bénévole
+     *
+     * result :
+     *     - Widget
+     */
     // On sauvegarde les pararmètres de la carte
     setState(() {
       SaveMap();
@@ -735,6 +790,12 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget getPointPage() {
+    /**
+     * Génère la page d'un point
+     *
+     * result :
+     *     - Widget
+     */
     // On sauvegarde les pararmètres de la carte
     setState(() {
       SaveMap();
@@ -744,6 +805,12 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget getMapPage() {
+    /**
+     * Génère la page de la carte
+     *
+     * result :
+     *     - Widget
+     */
     return Container(
         child: Scaffold(
       resizeToAvoidBottomInset: false,
@@ -759,6 +826,12 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget getParamPage() {
+    /**
+     * Génère la page des paramètres
+     *
+     * result :
+     *     - Widget
+     */
     setState(() {
       // On sauvegarde les pararmètres de la carte
       SaveMap();
@@ -781,15 +854,20 @@ class HomeScreenState extends State<HomeScreen> {
       },
       delMap: () {
         try {
+          // On récupère le chemin d'accés au dossier des cartes
           getMapTilepath().then((value) {
+            // On suprime le dossier
             Directory(value).deleteSync(recursive: true);
+            // On indique que les cartes ne sont pas chargées
             setState(() {
               _isTileSetLoaded = false;
               TileText = "Charger les cartes";
             });
           });
+          // En cas d'erreur
         } catch (e) {
           setState(() {
+            // On indique que les cartes ne sont pas chargées
             _isTileSetLoaded = false;
             TileText = "Charger les cartes";
           });
@@ -806,6 +884,12 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget getTempsPage() {
+    /**
+     * Génère la page des temps des participants
+     *
+     * result :
+     *     - Widget
+     */
     // On sauvegarde les pararmètres de la carte
     setState(() {
       SaveMap();
@@ -820,8 +904,15 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget getBottomBar() {
+    /**
+     * Génère la barre de navigation en bas
+     *
+     * result :
+     *     - Widget
+     */
     return BottomNavBarFb5(
       l: [
+        // La page de la carte
         IconBottomBar(
           text: "Carte",
           icon: FontAwesomeIcons.mapMarkedAlt,
@@ -832,6 +923,7 @@ class HomeScreenState extends State<HomeScreen> {
           },
           selected: _page == 0,
         ),
+        // La page des bénévoles
         IconBottomBar(
           text: "Bénévole",
           icon: FontAwesomeIcons.userAlt,
@@ -842,6 +934,7 @@ class HomeScreenState extends State<HomeScreen> {
           },
           selected: _page == 1,
         ),
+        // La page des points
         IconBottomBar(
           text: "Points",
           icon: FontAwesomeIcons.mapMarkerAlt,
@@ -852,6 +945,7 @@ class HomeScreenState extends State<HomeScreen> {
           },
           selected: _page == 2,
         ),
+        // La page des temps
         IconBottomBar(
           text: "Temps",
           icon: FontAwesomeIcons.stopwatch,
@@ -862,6 +956,7 @@ class HomeScreenState extends State<HomeScreen> {
           },
           selected: _page == 4,
         ),
+        // la page des paramètres
         IconBottomBar(
           text: "Paramètres",
           icon: FontAwesomeIcons.cog,
@@ -877,16 +972,18 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   FlutterMap _buildMap() {
-    /* Crée la carte, les points et les lignes
-    result :
-          - FlutterMap(Widget)
-    */
+    /**
+     * Crée la carte, les points et les lignes
+     *
+     * result :
+     *     - FlutterMap (Widget)
+     */
     return FlutterMap(
       mapController: _mapController,
       options: MapOptions(
         maxZoom: 17,
         minZoom: 8,
-        // On met les paramètres de sorte à se retruver avec la carte dans la même état que quand on est partit
+        // On met les paramètres de sorte à se retrouver avec la carte dans la même état que quand on est partit
         zoom: _zoom,
         center: _center,
         rotation: _rotation,
@@ -903,21 +1000,6 @@ class HomeScreenState extends State<HomeScreen> {
                 urlTemplate: _onlineMapScheme,
                 subdomains: ['a', 'b', 'c'],
               ),
-        /*_source.keys.toList()[0] == ConnectivityResult.none
-              ? TileLayerOptions(
-                  tileProvider: AssetTileProvider(),
-                  urlTemplate: _offlineMapScheme,
-                )
-              : TileLayerOptions(
-                  urlTemplate: _onlineMapScheme, subdomains: ['a', 'b', 'c']*/
-        /*'https://api.mapbox.com/styles/v1/khurzs/ckw90kcczdmh514pcmhg6rdnm/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoia2h1cnpzIiwiYSI6ImNrdzkwOXR2ZzFxdWMyeW1lMWNlYmZvMnEifQ.4Uy-gUkzVk0q1BXlQ8aHwA',
-          additionalOptions: {
-            'accessToken':
-        mapController: mapController,
-                'sk.eyJ1Ijoia2h1cnpzIiwiYSI6ImNrdzkxaWxuMTFxeHYyeG1lMXppdTk4djEifQ.Iof7IMiW2Ucnv7SGKlBW3Q',
-            'id': 'mapbox.mapbox-streets-v8'
-          }*/
-
         // On affiche les lignes
         PolylineLayerOptions(polylines: getPolyLines()),
         // On affiche les points
@@ -927,15 +1009,18 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   List<Marker> _buildMarkersOnMap() {
-    /* Crée les points sur la carte
-    result :
-          - List<Marker>
-    */
+    /**
+     * Crée les points sur la carte
+     *
+     * result :
+     *     - List<Marker>
+     */
     // On itère sur chaque point
     return posPoints
         .map((x) => new Marker(
             point: x.pos,
             width: 80.0,
+            // Les points importants sont plus gros
             height: x.type == 0 ? 145.0 : 165,
             builder: (context) => GestureDetector(
                 onTap: () {
@@ -955,6 +1040,7 @@ class HomeScreenState extends State<HomeScreen> {
                         style: TextStyle(
                             color: x.col,
                             fontWeight: FontWeight.w900,
+                            // Les points importants sont plus gros
                             fontSize: x.type == 0 ? 15 : 18),
                       ),
                     ),
@@ -963,8 +1049,7 @@ class HomeScreenState extends State<HomeScreen> {
                         // Si c'est un point classique
                         ? FaIcon(FontAwesomeIcons.mapMarkerAlt,
                             color: x.col, size: 52.0)
-                        // Si c'est un point principal
-
+                        // Si c'est un point principal, on affiche le logo du Raid
                         : Stack(children: [
                             Center(
                               child: FaIcon(FontAwesomeIcons.mapMarker,
@@ -984,12 +1069,6 @@ class HomeScreenState extends State<HomeScreen> {
                               ],
                             ))
                           ])
-                    /*Image.asset(
-                            'assets/images/test2.png',
-                            height: 60,
-                            width: 60,
-                          ),
-                          */
                   ],
                 ))))
         .toList();
@@ -997,8 +1076,12 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    /* Crée la page principale
-    */
+    /**
+     * Crée la page principale
+     *
+     * result :
+     *     - Widget
+     */
     // On crée le chemin vers le dossier des cartes
     getMapTilepath().then((value) {
       _offlineMapScheme = value + offlinePartMapScheme;

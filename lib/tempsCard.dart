@@ -40,13 +40,15 @@ class tempsCardState extends State<tempsCard> {
 
   @override
   Widget build(BuildContext context) {
-    /* Crée la page des paramètres
-    param :
-          - context (BuildContext)
-
-    result :
-          - Container(Widget)
-    */
+    /**
+     * Crée la page des paramètres
+     *
+     * param :
+     *     - context (BuildContext)
+     *
+     * result :
+     *     - Container(Widget)
+     */
     return Container(
         color: Colors.grey.shade100,
         child: SingleChildScrollView(
@@ -282,26 +284,50 @@ class tempsCardState extends State<tempsCard> {
   }
 
   List<Equipe> sort() {
+    /**
+     * Trie la liste des équipes
+     *
+     * result :
+     *     - List<Equipe>
+     */
     widget.eq.sort((a, b) => compare(a, b));
     return widget.eq;
   }
 
   int compare(Equipe a, Equipe b) {
+    /**
+     * Compare deux équipes, on les range par temps donné puis par numéro d'équipe
+     *
+     * param :
+     *     - a (Equipe)
+     *     - b (Equipe)
+     *
+     * result :
+     *     - int
+     */
+    // On regarde si les temps ont été donné
     bool astopped = a.temps[widget.type][widget.nomEpreuve] != null;
     bool bstopped = b.temps[widget.type][widget.nomEpreuve] != null;
+    // Si l'équipe a a son temps
     if (astopped) {
+      // Si l'équipe b a son temps
       if (bstopped) {
+        // On trie par numéro d'équipe
         if (a.num < b.num) {
           return -1;
         } else {
           return 1;
         }
       }
+      // l'équipe b est au dessus de a
       return 1;
     } else {
+      // Si l'équipe b a son temps
       if (bstopped) {
+        // l'équipe a est au dessus de b
         return -1;
       } else {
+        // On trie par numéro d'équipe
         if (a.num < b.num) {
           return -1;
         } else {
@@ -312,6 +338,9 @@ class tempsCardState extends State<tempsCard> {
   }
 
   Widget buildCard(Equipe e, int i) {
+    /**
+     * Crée la carte de l'équipe
+     */
     // Si on a arrêter le chrono de cette équipe
     bool stopped = e.temps[widget.type][widget.nomEpreuve] != null;
     return Container(
@@ -470,6 +499,7 @@ class tempsCardState extends State<tempsCard> {
                                             // On supprime le temps
                                             e.temps[widget.type]
                                                 [widget.nomEpreuve] = null;
+                                            // On sauvegarde le temps
                                             widget.db.updateEquipe(e);
                                             sleep(Duration(milliseconds: 100));
                                           });
@@ -479,6 +509,7 @@ class tempsCardState extends State<tempsCard> {
                               // On ajoute le temps
                               e.temps[widget.type][widget.nomEpreuve] =
                                   DateTime.now();
+                              // On sauvegarde le temps
                               widget.db.updateEquipe(e);
                               sleep(Duration(milliseconds: 100));
                             });

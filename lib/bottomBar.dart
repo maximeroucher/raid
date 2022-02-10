@@ -13,13 +13,15 @@ class BottomNavBarFb5 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /* Créer la barre
-    param :
-          - context (BuildContext)
-
-    result :
-          - Container(Widget)
-    */
+    /**
+     * Créer la barre
+     *
+     * param :
+     *     - context (BuildContext)
+     *
+     * result :
+     *     - Container(Widget)
+     */
     return Container(
       height: 60,
       decoration: BoxDecoration(

@@ -140,12 +140,17 @@ class DatabaseManager {
      */
     // La base de donnée
     final db = await instance.database;
+    // On récupère la première équipe
     final r = await db.rawQuery('''
       SELECT * FROM $tableEquipe LIMIT 1
       ''');
+    // On ne regarde que les colonnes après la 4e, puisqu'elles sont id, num, nom et type
     var l = r[0].keys.toList().sublist(4);
+    // La liste des épreuves
     List<String> resp = [];
+    // On ne regarde que la moitié de la liste
     for (int x = 0; x < l.length / 2; x++) {
+      // On reformatte le nom de la colonne pour l'affichage et on l'ajoute à la liste
       String s = l[x]
           .replaceAll("_", " ")
           .replaceAll("\$", "&")
@@ -199,6 +204,7 @@ class DatabaseManager {
   Future<List<Equipe>> readAllEquipe(List<String> listeEp) async {
     /**
      * Lis toutes les équipes de la base de donnée
+     *
      * result :
      *     - Future<List<Equipe>>
      */
@@ -235,7 +241,7 @@ class DatabaseManager {
      *     - b (Benevole)
      *
      * result :
-     *     - Future<int> l'identifiant du bénévole
+     *     - Future<int>
      */
     final db = await instance.database;
     return db.update(tableBenevole, b.toJson(),

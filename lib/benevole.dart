@@ -55,13 +55,25 @@ class Benevole {
 
   Benevole(int Id, String Nom, String Surnom, String Num, List<Point> Missions,
       int Type, int IndexMission, int StatusMission) {
-    /* Créer un bénévole à partir des informations
-    */
+    /**
+     * Créer un bénévole à partir des informations données
+     *
+     * param :
+     *     - Id (int) l'identifiant du bénévole
+     *     - Nom (String) le nom du bénévole
+     *     - Surnom (String) le surnom du bénévole
+     *     - Num (String) le numéro de téléphone du bénévole
+     *     - Missions (List<Point>) les missions
+     *     - Type (int) le type du bénévole
+     *     - IndexMission (int) l'index de la mission actuelle du bénévole dans la liste des missions
+     *     - StatusMision (int) Le status de la mission du bénévole
+     */
     id = Id;
     nom = Nom;
     surnom = Surnom;
     num = Num;
     missions = Missions;
+    // Le point actuel du bénévole est celui correspondant à l'index de la mission si il y a assez de mission
     pointActuel = missions.length > 0 ? missions[indexMission] : pointActuel;
     type = Type;
     indexMission = IndexMission;
@@ -70,13 +82,21 @@ class Benevole {
 
 
   static Benevole fromJson(Map<String, Object> json) =>
-    /* Créer un bénévole à partir des informations contenues dans un dictionnaire
-    */
+    /**
+     * Créer un bénévole à partir des informations contenues dans un dictionnaire
+     *
+     * param :
+     *     - json (Map<String, Objet>) le dictionnaire contenant les valeurs permettant de générer un bénévole
+     *
+     * result :
+     *     - Benevole
+     */
     Benevole(
         json[BenevoleFields.id] as int,
         json[BenevoleFields.nom] as String,
         json[BenevoleFields.surnom] as String,
         json[BenevoleFields.num] as String,
+        // On ne met pas les missions pour l'instant, ce sera fait à la main
         [],
         json[BenevoleFields.type] as int,
         json[BenevoleFields.indexMission] as int,
@@ -84,8 +104,12 @@ class Benevole {
       );
 
   Map<String, Object> toJson() =>
-    /* Crée le dictionnaire représentant le bénévole
-    */
+    /**
+     * Crée le dictionnaire représentant le bénévole
+     *
+     * result :
+     *     - Map<String, Objet> le dictionnaire représentant le bénévole
+     */
     {
         BenevoleFields.id: id,
         BenevoleFields.nom: nom,
@@ -99,8 +123,20 @@ class Benevole {
 
   Benevole copy({int id, String nom, String surnom, String num, List<Point> missions,
     Point pointActuel, int type, int indexMission, int statusMissions}) =>
-    /* Renvoie un bénévole avec les modifications données
-    */
+    /**
+     * Renvoie un bénévole avec les modifications données
+     *
+     * param :
+     *     - id (int) l'identifiant du bénévole
+     *     - nom (String) le nom du bénévole
+     *     - surnom (String) le surnom du bénévole
+     *     - num (String) le numéro de téléphone du bénévole
+     *     - missions (List<Point>) les missions
+     *     - pointActuel (Point) le point actuel du bénévole
+     *     - type (int) le type du bénévole
+     *     - indexMission (int) l'index de la mission actuelle du bénévole dans la liste des missions
+     *     - statusMision (int) Le status de la mission du bénévole
+     */
       Benevole(
         id ?? this.id,
         nom ?? this.nom,
@@ -112,13 +148,19 @@ class Benevole {
         statusMissions ?? this.statusMission
       );
 
-  Benevole.empty() {}
+  Benevole.empty() {
+    /**
+     * Génére un bénévole vide, pour éviter des erreurs d'initialisation
+     */
+  }
 
   IconData getIcon() {
-    /* Renvoie l'icône correspondant au type de bénévole
-    result :
-          - IconData
-    */
+    /**
+     * Renvoie l'icône correspondant au type de bénévole
+     *
+     * result :
+     *     - IconData
+     */
     // Si c'est un aiguilleur
     if (type == 0) {
       return FontAwesomeIcons.mapSigns;
@@ -138,13 +180,15 @@ class Benevole {
   }
 
   bool isType(String query) {
-    /* Permet de faire des recherche rapides dans la barre de recherche
-    param :
-          - query (String) la recherche
-
-    result :
-          - bool (si le bénévole s'accorde avec la recherche)
-    */
+    /**
+     * Permet de faire des recherche rapides dans la barre de recherche
+     *
+     * param :
+     *     - query (String) la recherche
+     *
+     * result :
+     *     - bool (si le bénévole s'accorde avec la recherche)
+     */
     // Si c'est un aiguilleur
     if (type == 0) {
       // Si query est dans "aiguilleur"

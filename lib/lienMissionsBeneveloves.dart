@@ -25,15 +25,27 @@ class Lien {
 
 
   Lien(int B, int M)
-  /* Crée un lien entre le bénévole donné et la mission donnée
-  */
+  /**
+   * Crée un lien entre le bénévole donné et la mission donnée
+   *
+   * param :
+   *     - B (int) l'identifiant du bénévole
+   *     - M (int) l'identifiant de la mission
+   */
   {
     ben = B;
     mission = M;
   }
 
   static Lien fromJson(Map<String, Object> json) =>
-  /* Crée un lien entre le bénévole donné et la mission donnée au format dictionnaire
+  /**
+   * Crée un lien entre le bénévole donné et la mission donnée au format dictionnaire
+   *
+   * param :
+   *     - json (Map<String, Objet>) le dictionnaire contenant les valeurs permettant de générer un lien
+   *
+   * result :
+   *     - Lien
   */
     Lien(
       json[LienFields.ben] as int,
@@ -41,8 +53,12 @@ class Lien {
     );
 
   Map<String, Object> toJson() =>
-  /* Crée le dictionnaire représentant le lien
-  */
+    /**
+     * Transforme un lien en dicionnaire
+     *
+     * result :
+     *     - Map<String, Objet> le dictionnaire représentant le lien
+     */
     {
       LienFields.ben: ben,
       LienFields.mission: mission,

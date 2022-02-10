@@ -63,8 +63,21 @@ class Point {
 
   Point(int Id, double Lat, double Long, String Nom, int Type, int Status,
       DateTime DateDebut, DateTime DateFin, int NumOnPoint, String PointPrec)
-  /* Crée un point avec les paramètres donnés
-  */
+  /**
+   * Crée un point avec les paramètres donnés
+   *
+   * param :
+   *     - Id (int) l'identifiant du point
+   *     - Lat (double) la latitude du point
+   *     - Long (double) la longitude du point
+   *     - Nom (String) le nom du point
+   *     - Type (int) le type du point
+   *     - Status (int) le status du point
+   *     - DateDebut (DateTime)
+   *     - DateFin (DateTime)
+   *     - NumOnPoint (int) le nombre de bénévole actuellement sur le point
+   *     - PointPrec (String) le nom du point précédent dans l'ordre ded la course
+   */
   {
     id = Id;
     lat = Lat;
@@ -77,15 +90,26 @@ class Point {
     dateFin = DateFin;
     numOnPoint = NumOnPoint;
     pointPrec = PointPrec;
+    // On charge la couleur du point
     getCol();
   }
 
-  // Crée un point vide (pour éviter des erreurs d'objet non défini)
-  Point.empty() {}
+  Point.empty() {
+    /**
+     * Crée un point vide, pour éviter des erreurs d'objet non défini
+     */
+  }
 
   static Point fromJson(Map<String, Object> json) =>
-      /* Crée un point avec les paramètres donnés au format dictionnaire
-  */
+    /**
+     * Créer un point à partir des informations contenues dans un dictionnaire
+     *
+     * param :
+     *     - json (Map<String, Objet>) le dictionnaire contenant les valeurs permettant de générer un point
+     *
+     * result :
+     *     - Point
+     */
       Point(
         json[PointFields.id] as int,
         json[PointFields.lat] as double,
@@ -101,7 +125,12 @@ class Point {
       );
 
   Map<String, Object> toJson() =>
-      // Transforme un point en dicionnaire
+    /**
+     * Crée le dictionnaire représentant le point
+     *
+     * result :
+     *     - Map<String, Objet> le dictionnaire représentant le point
+     */
       {
         PointFields.id: id,
         PointFields.lat: lat,
@@ -127,7 +156,21 @@ class Point {
           int numOnPoint,
           String pointPrec,
           String pointSuiv}) =>
-      // Copie le point en changeant les données données
+      /**
+     * Renvoie un point avec les modifications données
+     *
+     * param :
+     *     - id (int) l'identifiant du point
+     *     - lat (double) la latitude du point
+     *     - long (double) la longitude du point
+     *     - nom (String) le nom du point
+     *     - type (int) le type du point
+     *     - status (int) le status du point
+     *     - dateDebut (DateTime)
+     *     - dateFin (DateTime)
+     *     - numOnPoint (int) le nombre de bénévole actuellement sur le point
+     *     - pointPrec (String) le nom du point précédent dans l'ordre ded la course
+     */
       Point(
           id ?? this.id,
           lat ?? this.lat,
@@ -141,8 +184,9 @@ class Point {
           pointPrec ?? this.pointPrec);
 
   void getCol() {
-    /* Renvoie la couleur du point en fonction de son status et de son type
-    */
+    /**
+     * Change la couleur du point en fonction de son status et de son type
+     */
     // S'il n'y a personne
     if (status == 0) {
       col = Constants.personne;

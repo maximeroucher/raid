@@ -34,13 +34,15 @@ class benCardState extends State<benCard> {
 
   @override
   Widget build(BuildContext context) {
-    /* Créer la page bénévole
-    param :
-          - context (BuildContext)
-
-    result :
-          - Container (Widget)
-    */
+    /**
+     * Créer la page bénévole
+     *
+     * param :
+     *     - context (BuildContext)
+     *
+     * result :
+     *     - Container (Widget)
+     */
     Benevole b = widget.b;
     return Container(
         color: Colors.grey.shade100,
@@ -248,23 +250,27 @@ class benCardState extends State<benCard> {
   }
 
   void Action(String action, String num) async {
-    /* Lance soit la messagerie soit l'appel avec le numéro donné
-    param :
-           - action ("tel" / "sms") (String)
-           - num (String)
-    */
+    /**
+     * Lance soit la messagerie soit l'appel avec le numéro donné
+     *
+     * param :
+     *      - action ("tel" / "sms") (String)
+     *      - num (String)
+     */
     await launch(action + ':+' + num);
   }
 
   List<Widget> buildMissions(Benevole b, ScrollController _scrollController) {
-    /* Créer la liste des missions du bénévole
-    param :
-          - b (Benevole) le bénévole dont on veut afficher les missions
-          - _scrollController (ScrollController) le controlleur de défilement de la liste des missions
-
-    result :
-          - list(Widget)
-    */
+    /**
+     *  Créer la liste des missions du bénévole
+     *
+     * param :
+     *     - b (Benevole) le bénévole dont on veut afficher les missions
+     *     - _scrollController (ScrollController) le controlleur de défilement de la liste des missions
+     *
+     * result :
+     *     - list(Widget)
+     */
     return b.missions
         // On transforme la liste en dictionnaire pour récupérer l'index de chaque mission
         .asMap()

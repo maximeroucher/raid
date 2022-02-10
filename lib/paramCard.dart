@@ -37,12 +37,13 @@ class paramCardState extends State<paramCard> {
 
   @override
   Widget build(BuildContext context) {
-    /* Crée la page des paramètres
-    param :
-          - context (BuildContext)
-
-    result :
-          - Container(Widget)
+    /**
+     * Crée la page des paramètres
+     * param :
+     *     - context (BuildContext)
+     *
+     * result :
+     *     - Container(Widget)
     */
     return Container(
         color: Colors.grey.shade100,

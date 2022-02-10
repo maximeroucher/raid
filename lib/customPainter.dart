@@ -5,8 +5,13 @@ import 'package:flutter/material.dart';
 class CurvePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    /* Trace l'arc de cercle intérieur et le rempli de l'extérieur
-    */
+    /**
+     * Trace l'arc de cercle intérieur et le rempli de l'extérieur
+     *
+     * param :
+     *     - canvas (Canvas)
+     *     - size (Size)
+     */
     var paint = Paint();
     // La couleur de remplissage
     paint.color = Colors.grey.shade100;
