@@ -73,8 +73,6 @@ class DatabaseManager {
         ${PointFields.nom} $stringType,
         ${PointFields.type} $intType,
         ${PointFields.status} $intType,
-        ${PointFields.dateDebut} $stringType,
-        ${PointFields.dateFin} $stringType,
         ${PointFields.numOnPoint} $intType,
         ${PointFields.pointPrec} $stringType
     );
@@ -84,7 +82,9 @@ class DatabaseManager {
     await db.execute('''
     CREATE TABLE IF NOT EXISTS $tableLien (
         ${LienFields.ben} $intType,
-        ${LienFields.mission} $intType
+        ${LienFields.mission} $intType,
+        ${PointFields.dateDebut} $stringType,
+        ${PointFields.dateFin} $stringType
     );
     ''');
   }
@@ -189,7 +189,13 @@ class DatabaseManager {
         final respPoints = await db.query(tablePoint,
             where: '${PointFields.id} = ?', whereArgs: [l.mission]);
         // On ajoute le point transformé à la lsite des points du bénévole
-        pts.addAll(respPoints.map((e) => Point.fromJson(e)).toList());
+        pts.addAll(respPoints.map((e) {
+          Point p = Point.fromJson(e);
+          // On rempli les date de début et fin
+          p.dateDebut = l.dateDebut;
+          p.dateFin = l.dateFin;
+          return p;
+        }).toList());
       }
       // On ajoute les mission du bénévole
       b.missions = pts;
@@ -285,14 +291,15 @@ class DatabaseManager {
 
       // On cherche le point dans la base de donnée
       final isIn = await db.query('${tablePoint}',
-          columns: ['${PointFields.id}'],
-          where: '${PointFields.nom} = ?',
-          whereArgs: [p.nom]);
+          where: '${PointFields.nom} = ?', whereArgs: [p.nom]);
+      print(isIn);
 
       // On crée le lien entre un bénévole à présicer et le point
-      List<Lien> liens = isIn.map((e) => Lien(0, e["id"] as int)).toList();
+      List<Lien> liens = isIn
+          .map((e) => Lien(0, e["id"] as int, p.dateDebut, p.dateFin))
+          .toList();
       // On crée le lien entre le bénévole et un point à préciser
-      Lien l = Lien(id, 0);
+      Lien l = Lien(id, 0, p.dateDebut, p.dateFin);
 
       // Si le point est déjà dans la basee de donnée
       if (liens.length > 0) {

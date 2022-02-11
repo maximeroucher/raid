@@ -359,19 +359,20 @@ class HomeScreenState extends State<HomeScreen> {
       final content = await sourceFile.readAsString();
       final data = await json.decode(content);
       // On crée les variabbles globales de l'application et on les renseigne
-      posPoints = [];
-      // Pour chaque point
-      for (int x = 0; x < data["pt"].length; x++) {
-        // On met les dates au bon format
-        data["pt"][x]["dateDebut"] = formatDate(data["pt"][x]["dateDebut"]);
-        data["pt"][x]["dateFin"] = formatDate(data["pt"][x]["dateFin"]);
-        // On l'ajoute à la liste des points
-        posPoints.add(Point.fromJson(data["pt"][x]));
-      }
       // Les liens entre missions et points
       List<Lien> liens = [];
       for (int x = 0; x < data["lien"].length; x++) {
+        // On met les dates au bon format
+        data["lien"][x]["dateDebut"] = formatDate(data["lien"][x]["dateDebut"]);
+        data["lien"][x]["dateFin"] = formatDate(data["lien"][x]["dateFin"]);
+        // On ajoute le lien à la liste
         liens.add(Lien.fromJson(data["lien"][x]));
+      }
+      posPoints = [];
+      // Pour chaque point
+      for (int x = 0; x < data["pt"].length; x++) {
+        // On l'ajoute à la liste des points
+        posPoints.add(Point.fromJson(data["pt"][x]));
       }
       // La liste des bénévoles
       ben = [];
@@ -386,9 +387,14 @@ class HomeScreenState extends State<HomeScreen> {
             // Pour chaque point
             for (Point p in posPoints) {
               // Si c'est le point du lien
-              if (p.id == l.mission) {
+              if (p.id == l.mission && b.id == l.ben) {
+                // On copie le point pour éviter les alias
+                Point p2 = p.copy();
+                // On change les temps de début et de fin de mission en fonction du bénévole
+                p2.dateDebut = l.dateDebut;
+                p2.dateFin = l.dateFin;
                 // On l'ajoute à la liste des missions
-                missions.add(p);
+                missions.add(p2);
               }
             }
           }

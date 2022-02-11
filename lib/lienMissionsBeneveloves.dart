@@ -9,11 +9,15 @@ class LienFields {
   static final List<String> values = [
     ben,
     mission,
+    dateDebut,
+    dateFin,
   ];
 
   // Le nom des colonnes dans la base de donnée
   static final String ben = "benevole";
   static final String mission = "mission";
+  static final String dateDebut = "dateDebut";
+  static final String dateFin = "dateFin";
 }
 
 // La représentation d'un lien entre un bénévole et une mission
@@ -22,23 +26,28 @@ class Lien {
   int ben = 0;
   // La mission (son identifiant)
   int mission = 0;
+  // la date de début de mission
+  DateTime dateDebut = null;
+  // La date de fin de mission
+  DateTime dateFin = null;
 
-
-  Lien(int B, int M)
+  Lien(int Ben, int Mission, DateTime DateDebut, DateTime DateFin)
   /**
    * Crée un lien entre le bénévole donné et la mission donnée
    *
    * param :
-   *     - B (int) l'identifiant du bénévole
-   *     - M (int) l'identifiant de la mission
+   *     - Ben (int) l'identifiant du bénévole
+   *     - Mission (int) l'identifiant de la mission
    */
   {
-    ben = B;
-    mission = M;
+    ben = Ben;
+    mission = Mission;
+    dateDebut = DateDebut;
+    dateFin = DateFin;
   }
 
   static Lien fromJson(Map<String, Object> json) =>
-  /**
+      /**
    * Crée un lien entre le bénévole donné et la mission donnée au format dictionnaire
    *
    * param :
@@ -47,20 +56,24 @@ class Lien {
    * result :
    *     - Lien
   */
-    Lien(
-      json[LienFields.ben] as int,
-      json[LienFields.mission] as int,
-    );
+      Lien(
+        json[LienFields.ben] as int,
+        json[LienFields.mission] as int,
+        DateTime.parse(json[LienFields.dateDebut] as String),
+        DateTime.parse(json[LienFields.dateFin] as String),
+      );
 
   Map<String, Object> toJson() =>
-    /**
+      /**
      * Transforme un lien en dicionnaire
      *
      * result :
      *     - Map<String, Objet> le dictionnaire représentant le lien
      */
-    {
-      LienFields.ben: ben,
-      LienFields.mission: mission,
-    };
+      {
+        LienFields.ben: ben,
+        LienFields.mission: mission,
+        LienFields.dateDebut: dateDebut.toString(),
+        LienFields.dateFin: dateFin.toString(),
+      };
 }

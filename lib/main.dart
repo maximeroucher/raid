@@ -52,10 +52,4 @@ Possible :
 
 
 app bénévole (liste mission / liste num autre (msg, tel) / btn arrivée pt / 1er / dernier // page tps participant)
-
---------------------------------------------------------------------------------
-
-./02
-
-programme pr créer json
 */

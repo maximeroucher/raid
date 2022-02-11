@@ -117,9 +117,8 @@ class Point {
         json[PointFields.nom] as String,
         json[PointFields.type] as int,
         json[PointFields.status] as int,
-        // On reconvertit le texte en objet date
-        DateTime.parse(json[PointFields.dateDebut] as String),
-        DateTime.parse(json[PointFields.dateFin] as String),
+        null,
+        null,
         json[PointFields.numOnPoint] as int,
         json[PointFields.pointPrec] as String,
       );
@@ -138,8 +137,6 @@ class Point {
         PointFields.nom: nom,
         PointFields.type: type,
         PointFields.status: status,
-        PointFields.dateDebut: dateDebut.toString(),
-        PointFields.dateFin: dateFin.toString(),
         PointFields.numOnPoint: numOnPoint,
         PointFields.pointPrec: pointPrec
       };
