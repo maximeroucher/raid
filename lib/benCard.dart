@@ -159,22 +159,16 @@ class benCardState extends State<benCard> {
             ),
             // Le conteneur de la liste des missions qui s'étend sur toute la hauteur possible
             Expanded(
-              // Enlève l'effet quand on arrive au bout du défilement de la liste des missions
-              child: NotificationListener<OverscrollIndicatorNotification>(
-                onNotification: (OverscrollIndicatorNotification overscroll) {
-                  overscroll.disallowIndicator();
-                  return;
-                },
                 // Le défilement dans la largeur
                 child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
+                    physics: BouncingScrollPhysics(),
                     controller: _scrollController,
                     child: Container(
                       alignment: Alignment.center,
                       // la liste des misisons
                       child: Row(children: buildMissions(b, _scrollController)),
                     )),
-              ),
             ),
             // Les deux boutons sont contenues dans une ligne
             Row(

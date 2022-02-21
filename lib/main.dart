@@ -14,9 +14,6 @@ class MyApp extends StatelessWidget {
 
 Json doit changer de nom ou desinstaller app (sinon pb cache)
 
-10/02 : != tps pr mm pt (chgt datedebut / fin (tabledate (id ben, nom pt, dadedebut, detafin)))
-
-
 test IOS
 
 pb : map oline charge qd mm
