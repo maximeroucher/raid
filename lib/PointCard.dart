@@ -39,227 +39,225 @@ class benCardState extends State<pointCard> {
     bool check = e.indexMission == ind;
     List<Benevole> Pben = getPointBen(p);
     // La carte du bénévole
-    return Container(
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(25, 20, 25, 20),
-        child: Container(
-            height: 140,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(23),
-              color: Constants.background,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: Offset(0, 5), //  changes position of shadow
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Container(
-                  height: 15,
-                ),
-                Text(
-                  e.surnom.isNotEmpty ? e.surnom : e.nom,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Constants.darkgrad,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 25),
-                ),
-                Container(
-                  height: 2,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      height: 0,
-                    ),
-                    Container(
-                      height: 90,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Container(
-                            width: 65,
-                            // Le bouton personne
-                            child: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  if (e.missions[e.indexMission].nom == p.nom) {
-                                    update(e, p, ind, Pben, 0);
-                                  }
-                                });
-                              },
-                              icon: FaIcon(
-                                FontAwesomeIcons.times,
-                                size:
-                                    (!check || e.statusMission == 0) ? 45 : 40,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(25, 20, 25, 20),
+      child: Container(
+          height: 140,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(23),
+            color: Constants.background,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 5), //  changes position of shadow
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Container(
+                height: 15,
+              ),
+              Text(
+                e.surnom.isNotEmpty ? e.surnom : e.nom,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    color: Constants.darkgrad,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25),
+              ),
+              Container(
+                height: 2,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    height: 0,
+                  ),
+                  SizedBox(
+                    height: 90,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        SizedBox(
+                          width: 65,
+                          // Le bouton personne
+                          child: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                if (e.missions[e.indexMission].nom == p.nom) {
+                                  update(e, p, ind, Pben, 0);
+                                }
+                              });
+                            },
+                            icon: FaIcon(
+                              FontAwesomeIcons.times,
+                              size:
+                                  (!check || e.statusMission == 0) ? 45 : 40,
+                              color: (!check || e.statusMission == 0)
+                                  ? Constants.personne
+                                  : Constants.disable,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 0,
+                        ),
+                        SizedBox(
+                          width: 65,
+                          child: Text(
+                            "Personne",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
                                 color: (!check || e.statusMission == 0)
                                     ? Constants.personne
                                     : Constants.disable,
-                              ),
-                            ),
+                                fontWeight: FontWeight.bold,
+                                fontSize: (!check || e.statusMission == 0)
+                                    ? 15
+                                    : 12),
                           ),
-                          Container(
-                            height: 0,
-                          ),
-                          Container(
-                            width: 65,
-                            child: Text(
-                              "Personne",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: (!check || e.statusMission == 0)
-                                      ? Constants.personne
-                                      : Constants.disable,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: (!check || e.statusMission == 0)
-                                      ? 15
-                                      : 12),
-                            ),
-                          )
-                        ],
-                      ),
+                        )
+                      ],
                     ),
-                    Container(
-                      height: 90,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Container(
-                            width: 65,
-                            child: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  update(e, p, ind, Pben, 1);
-                                });
-                              },
-                              icon: FaIcon(
-                                FontAwesomeIcons.mapMarkerAlt,
-                                size: (check && e.statusMission == 1) ? 40 : 35,
-                                color: (check && e.statusMission == 1)
-                                    ? Constants.arrivee
-                                    : Constants.disable,
-                              ),
+                  ),
+                  SizedBox(
+                    height: 90,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        SizedBox(
+                          width: 65,
+                          child: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                update(e, p, ind, Pben, 1);
+                              });
+                            },
+                            icon: FaIcon(
+                              FontAwesomeIcons.mapMarkerAlt,
+                              size: (check && e.statusMission == 1) ? 40 : 35,
+                              color: (check && e.statusMission == 1)
+                                  ? Constants.arrivee
+                                  : Constants.disable,
                             ),
                           ),
-                          Container(
-                            height: 0,
+                        ),
+                        Container(
+                          height: 0,
+                        ),
+                        SizedBox(
+                          width: 65,
+                          child: Text(
+                            "Arrivée",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: (check && e.statusMission == 1)
+                                  ? Constants.arrivee
+                                  : Constants.disable,
+                              fontWeight: FontWeight.bold,
+                              fontSize:
+                                  (check && e.statusMission == 1) ? 15 : 13,
+                            ),
                           ),
-                          Container(
-                            width: 65,
-                            child: Text(
-                              "Arrivée",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: (check && e.statusMission == 1)
-                                    ? Constants.arrivee
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 90,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        SizedBox(
+                          width: 65,
+                          child: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                update(e, p, ind, Pben, 2);
+                              });
+                            },
+                            icon: FaIcon(FontAwesomeIcons.trophy,
+                                size:
+                                    (check && e.statusMission == 2) ? 40 : 35,
+                                color: (check && e.statusMission == 2)
+                                    ? Constants.premier
+                                    : Constants.disable),
+                          ),
+                        ),
+                        Container(
+                          height: 0,
+                        ),
+                        SizedBox(
+                          width: 65,
+                          child: Text(
+                            "Premier",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: (check && e.statusMission == 2)
+                                    ? Constants.premier
                                     : Constants.disable,
                                 fontWeight: FontWeight.bold,
-                                fontSize:
-                                    (check && e.statusMission == 1) ? 15 : 13,
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Container(
-                      height: 90,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Container(
-                            width: 65,
-                            child: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  update(e, p, ind, Pben, 2);
-                                });
-                              },
-                              icon: FaIcon(FontAwesomeIcons.trophy,
-                                  size:
-                                      (check && e.statusMission == 2) ? 40 : 35,
-                                  color: (check && e.statusMission == 2)
-                                      ? Constants.premier
-                                      : Constants.disable),
-                            ),
+                                fontSize: (check && e.statusMission == 2)
+                                    ? 15
+                                    : 12),
                           ),
-                          Container(
-                            height: 0,
-                          ),
-                          Container(
-                            width: 65,
-                            child: Text(
-                              "Premier",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: (check && e.statusMission == 2)
-                                      ? Constants.premier
-                                      : Constants.disable,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: (check && e.statusMission == 2)
-                                      ? 15
-                                      : 12),
-                            ),
-                          )
-                        ],
-                      ),
+                        )
+                      ],
                     ),
-                    Container(
-                      height: 90,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Container(
-                            width: 65,
-                            child: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  update(e, p, ind, Pben, 3);
-                                });
-                              },
-                              icon: FaIcon(FontAwesomeIcons.stopwatch,
-                                  size:
-                                      (check && e.statusMission == 3) ? 40 : 35,
-                                  color: (check && e.statusMission == 3)
-                                      ? Constants.dernier
-                                      : Constants.disable),
-                            ),
+                  ),
+                  SizedBox(
+                    height: 90,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        SizedBox(
+                          width: 65,
+                          child: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                update(e, p, ind, Pben, 3);
+                              });
+                            },
+                            icon: FaIcon(FontAwesomeIcons.stopwatch,
+                                size:
+                                    (check && e.statusMission == 3) ? 40 : 35,
+                                color: (check && e.statusMission == 3)
+                                    ? Constants.dernier
+                                    : Constants.disable),
                           ),
-                          Container(
-                            height: 0,
+                        ),
+                        Container(
+                          height: 0,
+                        ),
+                        SizedBox(
+                          width: 65,
+                          child: Text(
+                            "Dernier",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: (check && e.statusMission == 3)
+                                    ? Constants.dernier
+                                    : Constants.disable,
+                                fontWeight: FontWeight.bold,
+                                fontSize: (check && e.statusMission == 3)
+                                    ? 15
+                                    : 12),
                           ),
-                          Container(
-                            width: 65,
-                            child: Text(
-                              "Dernier",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: (check && e.statusMission == 3)
-                                      ? Constants.dernier
-                                      : Constants.disable,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: (check && e.statusMission == 3)
-                                      ? 15
-                                      : 12),
-                            ),
-                          )
-                        ],
-                      ),
+                        )
+                      ],
                     ),
-                    Container(
-                      height: 0,
-                    ),
-                  ],
-                )
-              ],
-            )),
-      ),
+                  ),
+                  Container(
+                    height: 0,
+                  ),
+                ],
+              )
+            ],
+          )),
     );
   }
 
@@ -305,7 +303,7 @@ class benCardState extends State<pointCard> {
             (element) => element.missions[element.indexMission].nom == prev.nom)
         .toList();
     // On met à jour le status du point précédent
-    prev.status = (listPrev.length > 0)
+    prev.status = (listPrev.isNotEmpty)
         ? listPrev
             // On regarde leur status
             .map((element) => element.statusMission)
@@ -394,7 +392,7 @@ class benCardState extends State<pointCard> {
           // Le fonc en haut de l'application
           Container(
             height: 300,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage("assets/images/backgroundtest.jpg"),
                 fit: BoxFit.cover,
@@ -406,19 +404,19 @@ class benCardState extends State<pointCard> {
                 Container(
                   height: 60,
                 ),
-                Container(
+                SizedBox(
                   height: 35,
                   // le nom du point
                   child: Text(
                     p.nom,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Constants.background,
                         fontWeight: FontWeight.w900,
                         fontSize: 35),
                   ),
                 ),
-                Container(
+                SizedBox(
                   height: 65,
                   child: GestureDetector(
                     child: Row(
@@ -438,7 +436,7 @@ class benCardState extends State<pointCard> {
                                 p.lat.toStringAsFixed(6) +
                                 ", Long : " +
                                 p.long.toStringAsFixed(6),
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Constants.background,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15),
@@ -449,7 +447,7 @@ class benCardState extends State<pointCard> {
                             height: 40,
                           ),
                           // L'icône copier-coller
-                          FaIcon(
+                          const FaIcon(
                             FontAwesomeIcons.copy,
                             size: 22,
                             color: Constants.background,
@@ -468,12 +466,12 @@ class benCardState extends State<pointCard> {
                   ),
                 ),
                 // le coin arrondi
-                Container(
+                SizedBox(
                     height: 70,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
+                        SizedBox(
                           width: 70,
                           height: 70,
                           child: CustomPaint(
@@ -487,7 +485,7 @@ class benCardState extends State<pointCard> {
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
                       borderRadius:
-                          BorderRadius.only(topRight: Radius.circular(70)),
+                          const BorderRadius.only(topRight: Radius.circular(70)),
                       color: Colors.grey.shade100,
                     ),
                     alignment: Alignment.center,
@@ -495,7 +493,7 @@ class benCardState extends State<pointCard> {
                       Container(
                         height: 35,
                       ),
-                      Text(
+                      const Text(
                         "Bénévoles",
                         style: TextStyle(
                             color: Constants.darkgrad,

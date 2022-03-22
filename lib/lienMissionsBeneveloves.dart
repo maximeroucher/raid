@@ -1,7 +1,7 @@
 // Cette classe sert uniquement pour la base de donnée afin de lier les bénévoles à leurs missions
 
 // Le nom de la table dans la base de donnée
-final String tableLien = "lien";
+const String tableLien = "lien";
 
 // La classe contenant les noms des colonnes dans la base de données
 class LienFields {
@@ -14,10 +14,10 @@ class LienFields {
   ];
 
   // Le nom des colonnes dans la base de donnée
-  static final String ben = "benevole";
-  static final String mission = "mission";
-  static final String dateDebut = "dateDebut";
-  static final String dateFin = "dateFin";
+  static const String ben = "benevole";
+  static const String mission = "mission";
+  static const String dateDebut = "dateDebut";
+  static const String dateFin = "dateFin";
 }
 
 // La représentation d'un lien entre un bénévole et une mission
@@ -27,9 +27,9 @@ class Lien {
   // La mission (son identifiant)
   int mission = 0;
   // la date de début de mission
-  DateTime dateDebut = null;
+  DateTime dateDebut;
   // La date de fin de mission
-  DateTime dateFin = null;
+  DateTime dateFin;
 
   Lien(int Ben, int Mission, DateTime DateDebut, DateTime DateFin)
   /**

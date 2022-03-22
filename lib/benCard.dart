@@ -19,7 +19,7 @@ class benCard extends StatefulWidget {
 }
 
 class benCardState extends State<benCard> {
-  ScrollController _scrollController = new ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -52,7 +52,7 @@ class benCardState extends State<benCard> {
             // L'image du fonc en haut de la page
             Container(
               height: 300,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage("assets/images/backgroundtest.jpg"),
                   fit: BoxFit.cover,
@@ -66,12 +66,12 @@ class benCardState extends State<benCard> {
                   // Le surnom du bénévole
                   (b.surnom.isNotEmpty)
                       // Si il a un surnom
-                      ? Container(
+                      ? SizedBox(
                           height: 55,
                           child: Text(
                             b.surnom,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Constants.background,
                                 fontWeight: FontWeight.w900,
                                 fontSize: 35),
@@ -82,23 +82,23 @@ class benCardState extends State<benCard> {
                           height: 55,
                         ),
                   // Le nom du bénévole
-                  Container(
+                  SizedBox(
                     height: 45,
                     child: Text(
                       b.nom,
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: Constants.background,
                           fontWeight: FontWeight.bold,
                           fontSize: 18),
                     ),
                   ),
                   // Le numéro du bénévole
-                  Container(
+                  SizedBox(
                     height: 70,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
+                        SizedBox(
                           width: 70,
                           height: 70,
                           // L'arrondi en haut à droite
@@ -110,7 +110,7 @@ class benCardState extends State<benCard> {
                           children: [
                             Text(
                               b.num,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: Constants.background,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 20),
@@ -129,18 +129,18 @@ class benCardState extends State<benCard> {
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
                       borderRadius:
-                          BorderRadius.only(topRight: Radius.circular(70)),
+                          const BorderRadius.only(topRight: Radius.circular(70)),
                       color: Colors.grey.shade100,
                     ),
                     alignment: Alignment.center,
                     child: // Le texte pour les missions
-                      b.missions.length > 0
+                      b.missions.isNotEmpty
                       // Si le bénévole a des missions
                       ? Column(children: [
                           Container(
                             height: 35,
                           ),
-                          Text(
+                          const Text(
                             "Missions",
                             style: TextStyle(
                                 color: Constants.darkgrad,
@@ -162,7 +162,7 @@ class benCardState extends State<benCard> {
                 // Le défilement dans la largeur
                 child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    physics: BouncingScrollPhysics(),
+                    physics: const BouncingScrollPhysics(),
                     controller: _scrollController,
                     child: Container(
                       alignment: Alignment.center,
@@ -188,7 +188,7 @@ class benCardState extends State<benCard> {
                         color: Colors.grey.withOpacity(0.1),
                         spreadRadius: 1,
                         blurRadius: 5,
-                        offset: Offset(0, 5), //  changes position of shadow
+                        offset: const Offset(0, 5), //  changes position of shadow
                       ),
                     ],
                   ),
@@ -197,7 +197,7 @@ class benCardState extends State<benCard> {
                     onPressed: () {
                       Action("sms", b.num);
                     },
-                    icon: FaIcon(
+                    icon: const FaIcon(
                       Icons.message_rounded,
                       color: Constants.darkbtn,
                       size: 55,
@@ -205,7 +205,7 @@ class benCardState extends State<benCard> {
                   )
                 ),
                 // Fixe la hauteur de la ligne
-                Container(
+                const SizedBox(
                   height: 150,
                   width: 20,
                 ),
@@ -221,7 +221,7 @@ class benCardState extends State<benCard> {
                         color: Colors.grey.withOpacity(0.1),
                         spreadRadius: 1,
                         blurRadius: 5,
-                        offset: Offset(0, 5), //  changes position of shadow
+                        offset: const Offset(0, 5), //  changes position of shadow
                       ),
                     ],
                   ),
@@ -229,7 +229,7 @@ class benCardState extends State<benCard> {
                       onPressed: () {
                         Action('tel', b.num);
                       },
-                      icon: FaIcon(
+                      icon: const FaIcon(
                         FontAwesomeIcons.phoneAlt,
                         color: Constants.darkbtn,
                         size: 55,
@@ -274,7 +274,7 @@ class benCardState extends State<benCard> {
             // Le conteneur d'une mission
             Container(
               alignment: Alignment.center,
-              margin: EdgeInsets.only(left: 20.0, right: 20.0),
+              margin: const EdgeInsets.only(left: 20.0, right: 20.0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(70),
                 gradient: LinearGradient(
@@ -290,7 +290,7 @@ class benCardState extends State<benCard> {
                     color: Colors.grey.withOpacity(0.1),
                     spreadRadius: 1,
                     blurRadius: 5,
-                    offset: Offset(0, 5), //  changes position of shadow
+                    offset: const Offset(0, 5), //  changes position of shadow
                   ),
                 ],
               ),
@@ -302,7 +302,7 @@ class benCardState extends State<benCard> {
                     height: 50,
                   ),
                   // Le nom de la mission (le nom du point)
-                  Container(
+                  SizedBox(
                     height: 30,
                     child: Text(
                       e.nom,
@@ -317,7 +317,7 @@ class benCardState extends State<benCard> {
                     ),
                   ),
                   // L'heure de début et de fin de la mission
-                  Container(
+                  SizedBox(
                     height: 30,
                     child: Text(
                       e.dateDebut.hour.toString() +

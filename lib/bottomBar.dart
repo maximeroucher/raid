@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:raidmap/constant.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -24,7 +23,7 @@ class BottomNavBarFb5 extends StatelessWidget {
      */
     return Container(
       height: 60,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         image: DecorationImage(
           image: AssetImage("assets/images/backgroundtest.jpg"),
           fit: BoxFit.cover,
@@ -41,7 +40,7 @@ class BottomNavBarFb5 extends StatelessWidget {
               // Les boutons de la barre
               child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: this.l),
+                    children: l),
             ),
           ),
         ],
@@ -100,7 +99,7 @@ class IconBottomBarState extends State<IconBottomBar> {
                   Container(
                     height: 2,
                     width: 25,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       borderRadius:
                           BorderRadius.all(Radius.circular(2)),
                       color: Constants.background,

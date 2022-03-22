@@ -26,6 +26,8 @@ import 'lienMissionsBeneveloves.dart';
 
 // Le gestionnaire de toutes les pages et de la page de la carte
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => HomeScreenState();
 }
@@ -88,6 +90,7 @@ class HomeScreenState extends State<HomeScreen> {
   List<String> listeEpreuves = [];
 
   // Au lancemenent de l'application
+  @override
   void initState() {
     super.initState();
 
@@ -104,13 +107,14 @@ class HomeScreenState extends State<HomeScreen> {
       setState(() {
         // On les met dans ben
         ben = value;
+        ben.sort((a, b) => b.type - a.type);
 
         // S'il n'y en a pas
-        if (ben.length == 0) {
+        if (ben.isEmpty) {
           dataFromFile();
         } else {
           // On récupère les points
-          posPoints = InitPoints(ben);
+          posPoints = initPoints(ben);
           // Le bénévole sélectionné est le premier (La croix rouge)
           _selected = ben[0];
           // le point sélectionné est le preimer
@@ -149,7 +153,9 @@ class HomeScreenState extends State<HomeScreen> {
           posPoints = value[1];
           eq = value[2];
           listeEpreuves = value[3];
-          nomEpreuve = listeEpreuves[0];
+          if (nomEpreuve.isNotEmpty) {
+            nomEpreuve = listeEpreuves[0];
+          }
           // Le bénévole sélectionné est le premier (La croix rouge)
           _selected = ben[0];
           // le point sélectionné est le preimer
@@ -157,7 +163,7 @@ class HomeScreenState extends State<HomeScreen> {
           // Le centre est la position du premier point
           _center = _point.pos;
           // On sauvegarde les données dans la base de donnée
-          Genben();
+          genben();
         });
       });
     } catch (e) {
@@ -167,7 +173,7 @@ class HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void MapFromFile() {
+  void mapFromFile() {
     /**
      * Génère la base de donnée à partir d'un fichier
      */
@@ -211,7 +217,7 @@ class HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  List<Point> InitPoints(List<Benevole> ben) {
+  List<Point> initPoints(List<Benevole> ben) {
     /**
      * Récupère la liste des points
      *
@@ -239,7 +245,7 @@ class HomeScreenState extends State<HomeScreen> {
     return resp;
   }
 
-  void SaveMap() {
+  void saveMap() {
     /**
      * Sauvegarde l'état de l'affichage de la carte
      */
@@ -273,7 +279,7 @@ class HomeScreenState extends State<HomeScreen> {
       // Si ce point existe
       if (prec.nom != "") {
         // On ajoute un ligne entre ces deux points
-        list.add(new Polyline(
+        list.add(Polyline(
             points: [prec.pos, p.pos], strokeWidth: 3.0, color: p.col));
       }
     }
@@ -308,14 +314,14 @@ class HomeScreenState extends State<HomeScreen> {
      *     - List<Widget>
      */
     // S'il y des résultats
-    if (lb.length > 0) {
+    if (lb.isNotEmpty) {
       List<Widget> resp = [];
       // Pour les N - 1 premiers résultats
       for (int i = 0; i < lb.length - 1; i++) {
         // On crée la carte du bénévole
         resp.add(getSuggestion(lb[i]));
         // On espace avec la carte suivante
-        resp.add(SizedBox(
+        resp.add(const SizedBox(
           height: 10,
         ));
       }
@@ -338,7 +344,7 @@ class HomeScreenState extends State<HomeScreen> {
      */
     FilePickerResult result = await FilePicker.platform.pickFiles();
     // Évite les erreurs où result est null
-    FilePickerResult r = result ?? FilePickerResult([]);
+    FilePickerResult r = result ?? const FilePickerResult([]);
     return r;
   }
 
@@ -402,7 +408,7 @@ class HomeScreenState extends State<HomeScreen> {
         // On assigne les missions au bénévole
         b.missions = missions;
         // Si le bénévole a des missions (tout le monde sauf le samu et les bénévoles sportifs)
-        if (b.missions.length > 0) {
+        if (b.missions.isNotEmpty) {
           // On charge le point actuel
           b.pointActuel = b.missions[b.indexMission];
         }
@@ -439,7 +445,7 @@ class HomeScreenState extends State<HomeScreen> {
       TileText = "Décompression";
     });
     // On attend pour que le texte se mette à jour
-    await Future.delayed(Duration(microseconds: 1));
+    await Future.delayed(const Duration(microseconds: 1));
     // On lit le fichier
     final bytes = File(r.files.single.path).readAsBytesSync();
     // On récupère le dossier des cartes
@@ -480,7 +486,7 @@ class HomeScreenState extends State<HomeScreen> {
           TileText = "Chargement (" + v.toString() + "%)";
         });
         // On attend pour que le texte se mette à jour
-        await Future.delayed(Duration(microseconds: 1));
+        await Future.delayed(const Duration(microseconds: 1));
         // On met à jour le dernier pourcentage
         lv = v;
       }
@@ -556,7 +562,7 @@ class HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void Genben() async {
+  void genben() async {
     /**
      * Génère la base de donnée
      */
@@ -586,7 +592,7 @@ class HomeScreenState extends State<HomeScreen> {
 
     return FloatingSearchBar(
       hint: 'Rechercher bénévole',
-      hintStyle: TextStyle(color: Constants.text),
+      hintStyle: const TextStyle(color: Constants.text),
       backgroundColor: Constants.background,
       accentColor: Constants.darkgrad,
       scrollPadding: const EdgeInsets.only(top: 20, bottom: 60),
@@ -604,7 +610,7 @@ class HomeScreenState extends State<HomeScreen> {
           updateSearch("");
           setState(() {
             // On trie les bénévoles par type
-            ben.sort((a, b) => b.type - a.type);
+            //ben.sort((a, b) => b.type - a.type);
             _searchInit = true;
           });
         }
@@ -619,7 +625,7 @@ class HomeScreenState extends State<HomeScreen> {
         FloatingSearchBarAction(
           showIfOpened: false,
           child: CircularButton(
-            icon: Icon(
+            icon: const Icon(
               FontAwesomeIcons.userAlt,
               color: Constants.darkgrad,
             ),
@@ -663,7 +669,7 @@ class HomeScreenState extends State<HomeScreen> {
               color: Colors.grey.withOpacity(0.9),
               spreadRadius: 5,
               blurRadius: 20,
-              offset: Offset(0, 15), // changes position of shadow
+              offset: const Offset(0, 15), // changes position of shadow
             ),
           ]),
       // Quand on clique sur la carte
@@ -677,7 +683,7 @@ class HomeScreenState extends State<HomeScreen> {
           },
           splashColor: Colors.green.shade200,
           borderRadius: BorderRadius.circular(10),
-          child: Container(
+          child: SizedBox(
             height: 100,
             child: Row(
               children: [
@@ -705,20 +711,20 @@ class HomeScreenState extends State<HomeScreen> {
                             Text(
                               b.surnom,
                               textAlign: TextAlign.left,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: Constants.text,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 25),
                             ),
                             // On espace le surnom du nom
-                            SizedBox(
+                            const SizedBox(
                               height: 8,
                             ),
                             // On affiche le nom
                             Text(
                               b.nom,
                               textAlign: TextAlign.left,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: Constants.text,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13),
@@ -729,23 +735,23 @@ class HomeScreenState extends State<HomeScreen> {
                       : Text(
                           b.nom,
                           textAlign: TextAlign.left,
-                          style: TextStyle(
+                          style: const TextStyle(
                               color: Constants.text,
                               fontWeight: FontWeight.bold,
                               fontSize: 13),
                         ),
                 ),
                 // On affiche le point sur lequel le bénévole est actuellement
-                Container(
+                SizedBox(
                     width: 110,
                     child: Align(
                         alignment: Alignment.centerLeft,
-                        child: Container(
+                        child: SizedBox(
                           width: 90,
                           child: Text(
                             b.pointActuel.nom,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Constants.text,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20),
@@ -789,7 +795,7 @@ class HomeScreenState extends State<HomeScreen> {
      */
     // On sauvegarde les pararmètres de la carte
     setState(() {
-      SaveMap();
+      saveMap();
     });
     // On envoie sur la page du bénévole
     return benCard(b: _selected);
@@ -804,7 +810,7 @@ class HomeScreenState extends State<HomeScreen> {
      */
     // On sauvegarde les pararmètres de la carte
     setState(() {
-      SaveMap();
+      saveMap();
     });
     // On envoie sur la page du point
     return pointCard(p: _point, ben: ben, posPoints: posPoints, db: dbm);
@@ -817,18 +823,17 @@ class HomeScreenState extends State<HomeScreen> {
      * result :
      *     - Widget
      */
-    return Container(
-        child: Scaffold(
+    return Scaffold(
       resizeToAvoidBottomInset: false,
       // On superpose la carte et la barre de recherche
       body: Stack(
-        fit: StackFit.expand,
-        children: [
-          _buildMap(),
-          buildFloatingSearchBar(),
-        ],
+    fit: StackFit.expand,
+    children: [
+      _buildMap(),
+      buildFloatingSearchBar(),
+    ],
       ),
-    ));
+    );
   }
 
   Widget getParamPage() {
@@ -840,7 +845,7 @@ class HomeScreenState extends State<HomeScreen> {
      */
     setState(() {
       // On sauvegarde les pararmètres de la carte
-      SaveMap();
+      saveMap();
     });
     // On envoie sur la page des paramètres
     return paramCard(
@@ -883,7 +888,7 @@ class HomeScreenState extends State<HomeScreen> {
         dataFromFile();
       },
       addMap: () {
-        MapFromFile();
+        mapFromFile();
       },
       TileText: TileText,
     );
@@ -898,7 +903,7 @@ class HomeScreenState extends State<HomeScreen> {
      */
     // On sauvegarde les pararmètres de la carte
     setState(() {
-      SaveMap();
+      saveMap();
     });
     // On envoie sur la page du point
     return tempsCard(
@@ -999,7 +1004,7 @@ class HomeScreenState extends State<HomeScreen> {
             // La carte hors ligne
             ? TileLayerOptions(
                 urlTemplate: _offlineMapScheme,
-                tileProvider: FileTileProvider(),
+                tileProvider: const FileTileProvider(),
               )
             // La carte en ligne
             : TileLayerOptions(
@@ -1023,11 +1028,11 @@ class HomeScreenState extends State<HomeScreen> {
      */
     // On itère sur chaque point
     return posPoints
-        .map((x) => new Marker(
+        .map((x) => Marker(
             point: x.pos,
             width: 80.0,
             // Les points importants sont plus gros
-            height: x.type == 0 ? 145.0 : 165,
+            height: x.type == 0 ? 115.0 : 135,
             builder: (context) => GestureDetector(
                 onTap: () {
                   // Si on clique sur un point, on est redirigé vers la page des points avec le point choisis
@@ -1047,19 +1052,19 @@ class HomeScreenState extends State<HomeScreen> {
                             color: x.col,
                             fontWeight: FontWeight.w900,
                             // Les points importants sont plus gros
-                            fontSize: x.type == 0 ? 15 : 18),
+                            fontSize: x.type == 0 ? 12 : 15),
                       ),
                     ),
                     // On affiche l'icône du point, qui dépend du type du point
                     x.type == 0
                         // Si c'est un point classique
                         ? FaIcon(FontAwesomeIcons.mapMarkerAlt,
-                            color: x.col, size: 52.0)
+                            color: x.col, size: 42.0)
                         // Si c'est un point principal, on affiche le logo du Raid
                         : Stack(children: [
                             Center(
                               child: FaIcon(FontAwesomeIcons.mapMarker,
-                                  color: Colors.grey.shade100, size: 60.0),
+                                  color: Colors.grey.shade100, size: 50.0),
                             ),
                             Center(
                                 child: Column(
@@ -1069,8 +1074,8 @@ class HomeScreenState extends State<HomeScreen> {
                                 ),
                                 Image.asset(
                                   'assets/images/logo.png',
-                                  height: 33,
-                                  width: 33,
+                                  height: 27,
+                                  width: 27,
                                 ),
                               ],
                             ))

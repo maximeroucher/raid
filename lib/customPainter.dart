@@ -22,10 +22,10 @@ class CurvePainter extends CustomPainter {
     // On commence en haut à gauche
     path.moveTo(0, 0);
     // On trace un arc de cercle
-    final center = new Offset(size.width, 0);
-    final startAngle = -3.14;
-    final endAngle = -3.14 / 2;
-    path.arcTo(new Rect.fromCircle(center: center, radius: 70), startAngle,
+    final center = Offset(size.width, 0);
+    const startAngle = -3.14;
+    const endAngle = -3.14 / 2;
+    path.arcTo(Rect.fromCircle(center: center, radius: 70), startAngle,
         endAngle, true);
     // On ferme la courbe
     path.lineTo(0, size.height);

@@ -52,7 +52,7 @@ class paramCardState extends State<paramCard> {
             // L'image de fond
             Container(
               height: 300,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage("assets/images/backgroundtest.jpg"),
                   fit: BoxFit.cover,
@@ -63,7 +63,7 @@ class paramCardState extends State<paramCard> {
                   Container(
                     height: 100,
                   ),
-                  Container(
+                  const SizedBox(
                     height: 60,
                     child: Text(
                       "Paramètres",
@@ -75,13 +75,13 @@ class paramCardState extends State<paramCard> {
                     ),
                   ),
                   // Le numéro du bénévole
-                  Container(
+                  SizedBox(
                       height: 70,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           // La courbe à gauche
-                          Container(
+                          SizedBox(
                             width: 70,
                             height: 70,
                             child: CustomPaint(
@@ -99,7 +99,7 @@ class paramCardState extends State<paramCard> {
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
                         borderRadius:
-                            BorderRadius.only(topRight: Radius.circular(70)),
+                            const BorderRadius.only(topRight: Radius.circular(70)),
                         color: Colors.grey.shade100,
                       ),
                       child: Column(
@@ -107,7 +107,7 @@ class paramCardState extends State<paramCard> {
                           Container(
                             height: 30,
                           ),
-                          Center(
+                          const Center(
                             child: Text(
                               "Données",
                               style: TextStyle(
@@ -176,7 +176,7 @@ class paramCardState extends State<paramCard> {
                             color: Colors.grey.withOpacity(0.3),
                             spreadRadius: 1,
                             blurRadius: 5,
-                            offset: Offset(0, 3), //  changes position of shadow
+                            offset: const Offset(0, 3), //  changes position of shadow
                           ),
                         ],
                         gradient: LinearGradient(
@@ -194,7 +194,7 @@ class paramCardState extends State<paramCard> {
                         widget.isDBLoaded
                             ? "Supprimer les données"
                             : "Charger un fichier",
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: Constants.background,
                             fontWeight: FontWeight.w900,
                             fontSize: 18),
@@ -212,7 +212,7 @@ class paramCardState extends State<paramCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     // le text de la carte
-                    Text(
+                    const Text(
                       "Cartes",
                       style: TextStyle(
                           color: Constants.darkgrad,
@@ -271,7 +271,7 @@ class paramCardState extends State<paramCard> {
                             color: Colors.grey.withOpacity(0.3),
                             spreadRadius: 1,
                             blurRadius: 5,
-                            offset: Offset(0, 3),
+                            offset: const Offset(0, 3),
                           ),
                         ],
                         gradient: LinearGradient(
@@ -286,7 +286,7 @@ class paramCardState extends State<paramCard> {
                       // Le texte du bouton
                       child: Text(
                         widget.TileText,
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: Constants.background,
                             fontWeight: FontWeight.w900,
                             fontSize: 18),

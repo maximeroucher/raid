@@ -1,7 +1,5 @@
-import 'dart:ui';
 import 'constant.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 
 
 // Le fenêtre de confirmation
@@ -37,13 +35,13 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
       children: <Widget>[
         Container(
           // Eloigner les éléments du bord
-          padding: EdgeInsets.only(
+          padding: const EdgeInsets.only(
               left: Constants.padding,
               top: Constants.padding,
               right: Constants.padding,
               bottom: Constants.padding),
           // Eloigne le conteneur du bord
-          margin: EdgeInsets.only(top: Constants.avatarRadius),
+          margin: const EdgeInsets.only(top: Constants.avatarRadius),
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               color: Constants.background,
@@ -52,7 +50,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
               boxShadow: [
                 BoxShadow(
                     color: Colors.grey.shade700,
-                    offset: Offset(0, 5),
+                    offset: const Offset(0, 5),
                     blurRadius: 5),
               ]),
           child: Column(
@@ -61,27 +59,27 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
               // Le titre de la fenêtre
               Text(
                 widget.title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.w800,
                   color: Constants.darkgrad
                 ),
               ),
               // Espace entre le titre et la description
-              SizedBox(
+              const SizedBox(
                 height: 15,
               ),
               // La description
               Text(
                 widget.descriptions,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: Constants.dernier,
                 ),
                 textAlign: TextAlign.center,
               ),
               // Espace entre la description et les boutons
-              SizedBox(
+              const SizedBox(
                 height: 22,
               ),
               Align(
@@ -96,7 +94,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                           Navigator.of(context).pop();
                         },
                         // Le texte sur le bouton
-                        child: Text(
+                        child: const Text(
                           "Non",
                           style: TextStyle(
                             fontSize: 18,
@@ -111,7 +109,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                           widget.onYes();
                         },
                         // Le texte sur le bouton
-                        child: Text(
+                        child: const Text(
                           "Oui",
                           style: TextStyle(
                             fontSize: 18,

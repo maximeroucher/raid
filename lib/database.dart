@@ -16,7 +16,7 @@ class DatabaseManager {
   // La base de donnée
   static Database _database;
 
-  static final String filePath = 'database.db';
+  static const String filePath = 'database.db';
 
   // La conversion des types dart en type SQL
   final idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
@@ -170,7 +170,7 @@ class DatabaseManager {
     // La base de donnée
     final db = await instance.database;
     // Pour ordonner les résultats
-    final orderBy = '${BenevoleFields.type} DESC';
+    const orderBy = '${BenevoleFields.type} DESC';
     // On récupère tous les bénévoles de la base de donnée
     final result = await db.query(tableBenevole, orderBy: orderBy);
     // On transforme le résultat de la requête en liste de bénévole
@@ -200,7 +200,7 @@ class DatabaseManager {
       // On ajoute les mission du bénévole
       b.missions = pts;
       // On initialise la position du bénévole s'il a des missions
-      if (b.missions.length > 0) {
+      if (b.missions.isNotEmpty) {
         b.pointActuel = b.missions[b.indexMission];
       }
     }
@@ -217,7 +217,7 @@ class DatabaseManager {
     // La base de donnée
     final db = await instance.database;
     // Pour ordonner les résultats
-    final orderBy = '${EquipeFields.id}';
+    final orderBy = EquipeFields.id;
     // On récupère toutes les équipes de la base de donnée
     final result = await db.query(tableEquipe, orderBy: orderBy);
     // On transforme le résultat de la requête en liste d'équipe
@@ -290,7 +290,7 @@ class DatabaseManager {
       var Pid = 0;
 
       // On cherche le point dans la base de donnée
-      final isIn = await db.query('${tablePoint}',
+      final isIn = await db.query(tablePoint,
           where: '${PointFields.nom} = ?', whereArgs: [p.nom]);
       print(isIn);
 
@@ -302,7 +302,7 @@ class DatabaseManager {
       Lien l = Lien(id, 0, p.dateDebut, p.dateFin);
 
       // Si le point est déjà dans la basee de donnée
-      if (liens.length > 0) {
+      if (liens.isNotEmpty) {
         // L'identifiant est celui du premier lien
         Pid = liens[0].mission;
         // Sinon
@@ -349,7 +349,7 @@ class DatabaseManager {
      */
     final db = await instance.database;
     var r = await db.rawQuery("SELECT * FROM $tableBenevole");
-    return r.length != 0;
+    return r.isNotEmpty;
   }
 
   Future<void> delAll() async {

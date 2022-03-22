@@ -3,7 +3,7 @@ import 'package:latlong2/latlong.dart';
 import 'constant.dart';
 
 // Le nom de la table dans la base de donnée
-final String tablePoint = "point";
+const String tablePoint = "point";
 
 // La classe contenant les noms des colonnes dans la base de données
 class PointFields {
@@ -22,16 +22,16 @@ class PointFields {
   ];
 
   // Le nom des colonnes dans la base de donnée
-  static final String dateDebut = "dateDebut";
-  static final String dateFin = "dateFin";
-  static final String id = "id";
-  static final String lat = "lat";
-  static final String long = "long";
-  static final String nom = "nom";
-  static final String numOnPoint = "numOnPoint";
-  static final String pointPrec = "pointPrec";
-  static final String status = "status";
-  static final String type = "type";
+  static const String dateDebut = "dateDebut";
+  static const String dateFin = "dateFin";
+  static const String id = "id";
+  static const String lat = "lat";
+  static const String long = "long";
+  static const String nom = "nom";
+  static const String numOnPoint = "numOnPoint";
+  static const String pointPrec = "pointPrec";
+  static const String status = "status";
+  static const String type = "type";
 }
 
 // Représentation d'une mission

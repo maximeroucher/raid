@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 import 'point.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 // Le nom de la table dans la base de donnée
-final String tableBenevole = "benevole";
+const String tableBenevole = "benevole";
 
 // La classe contenant les noms des colonnes dans la base de données
 class BenevoleFields {
@@ -21,13 +20,13 @@ class BenevoleFields {
   ];
 
   // Le nom des colonnes dans la base de donnée
-  static final String id = "id";
-  static final String nom = "nom";
-  static final String surnom = "surnom";
-  static final String num = "num";
-  static final String type = "type";
-  static final String indexMission = "indexMission";
-  static final String statusMission = "statusMission";
+  static const String id = "id";
+  static const String nom = "nom";
+  static const String surnom = "surnom";
+  static const String num = "num";
+  static const String type = "type";
+  static const String indexMission = "indexMission";
+  static const String statusMission = "statusMission";
 }
 
 
@@ -44,7 +43,7 @@ class Benevole {
   // La liste de ses missions
   List<Point> missions = [];
   // Son point actuel (par défaut, le point en (0,0))
-  Point pointActuel = new Point.empty();
+  Point pointActuel = Point.empty();
   // Son type
   int type = 0; // 0 aiguilleur, 1 voiture, 2 sportif, 3 raid
   // Le numéro de sa mission actuelle
@@ -74,7 +73,7 @@ class Benevole {
     num = Num;
     missions = Missions;
     // Le point actuel du bénévole est celui correspondant à l'index de la mission si il y a assez de mission
-    pointActuel = missions.length > 0 ? missions[indexMission] : pointActuel;
+    pointActuel = missions.isNotEmpty ? missions[indexMission] : pointActuel;
     type = Type;
     indexMission = IndexMission;
     statusMission = StatusMission;
@@ -145,7 +144,7 @@ class Benevole {
         missions ?? this.missions,
         type ?? this.type,
         indexMission ?? this.indexMission,
-        statusMissions ?? this.statusMission
+        statusMissions ?? statusMission
       );
 
   Benevole.empty() {

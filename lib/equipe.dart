@@ -1,5 +1,5 @@
 // Le nom de la table dans la base de donnée
-final String tableEquipe = "equipe";
+const String tableEquipe = "equipe";
 
 // La classe contenant les noms des colonnes dans la base de données
 class EquipeFields {
@@ -12,10 +12,10 @@ class EquipeFields {
   ];
 
   // Le nom des colonnes dans la base de donnée
-  static final String id = "id";
-  static final String nom = "nom";
-  static final String num = "num";
-  static final String type = "type";
+  static const String id = "id";
+  static const String nom = "nom";
+  static const String num = "num";
+  static const String type = "type";
 }
 
 // Représentation d'une équipe
@@ -57,7 +57,7 @@ class Equipe {
      * Génère le dictionnaire du temps des épreuves 0 pour le départ et 1 pour l'arrivée
      */
     Map<String, DateTime> resp = {};
-    this.ep.map((e) => resp[e] = null).toList();
+    ep.map((e) => resp[e] = null).toList();
     return resp;
   }
 
@@ -122,12 +122,12 @@ class Equipe {
       EquipeFields.type: type,
     };
     // Pour les départs et arrivée
-    for (int x = 0; x < this.temps.length; x++) {
+    for (int x = 0; x < temps.length; x++) {
       // Pour chaque épreuve
-      for (String s in this.temps[x].keys) {
+      for (String s in temps[x].keys) {
         // On met dans le dictionnaire la valeur du temps
         resp[(s + x.toString()).replaceAll(" ", "_").replaceAll("&", "\$")] =
-            this.temps[x][s].toString();
+            temps[x][s].toString();
       }
     }
     return resp;
@@ -148,7 +148,7 @@ class Equipe {
        *     - Equipe
        */
       Equipe(id ?? this.id, num ?? this.num, nom ?? this.nom, type ?? this.type,
-          listeEp ?? this.ep);
+          listeEp ?? ep);
 
   String getTypeString() {
     /**
