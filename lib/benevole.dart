@@ -72,6 +72,7 @@ class Benevole {
     surnom = Surnom;
     num = Num;
     missions = Missions;
+    missions.sort((a, b) => a.dateDebut.compareTo(b.dateDebut));
     // Le point actuel du bénévole est celui correspondant à l'index de la mission si il y a assez de mission
     pointActuel = missions.isNotEmpty ? missions[indexMission] : pointActuel;
     type = Type;

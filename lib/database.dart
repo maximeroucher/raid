@@ -144,20 +144,24 @@ class DatabaseManager {
     final r = await db.rawQuery('''
       SELECT * FROM $tableEquipe LIMIT 1
       ''');
-    // On ne regarde que les colonnes après la 4e, puisqu'elles sont id, num, nom et type
-    var l = r[0].keys.toList().sublist(4);
-    // La liste des épreuves
-    List<String> resp = [];
-    // On ne regarde que la moitié de la liste
-    for (int x = 0; x < l.length / 2; x++) {
-      // On reformatte le nom de la colonne pour l'affichage et on l'ajoute à la liste
-      String s = l[x]
-          .replaceAll("_", " ")
-          .replaceAll("\$", "&")
-          .substring(0, l[x].length - 1);
-      resp.add(s);
+    if (r.isNotEmpty) {
+      // On ne regarde que les colonnes après la 4e, puisqu'elles sont id, num, nom et type
+      var l = r[0].keys.toList().sublist(4);
+      // La liste des épreuves
+      List<String> resp = [];
+      // On ne regarde que la moitié de la liste
+      for (int x = 0; x < l.length / 2; x++) {
+        // On reformatte le nom de la colonne pour l'affichage et on l'ajoute à la liste
+        String s = l[x]
+            .replaceAll("_", " ")
+            .replaceAll("\$", "&")
+            .substring(0, l[x].length - 1);
+        resp.add(s);
+      }
+      return resp.toList();
+    } else {
+      return [];
     }
-    return resp.toList();
   }
 
   Future<List<Benevole>> readAllBenevoles() async {

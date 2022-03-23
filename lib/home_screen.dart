@@ -48,7 +48,7 @@ class HomeScreenState extends State<HomeScreen> {
   // la rotation de la carte
   double _rotation = 0.0;
   // Le zoom de la carte
-  double _zoom = 15.0;
+  double _zoom = 13.0;
 
   // Si la carte est chargée
   bool _isMapReady = false;
@@ -120,11 +120,14 @@ class HomeScreenState extends State<HomeScreen> {
           // le point sélectionné est le preimer
           _point = posPoints[0];
           // Le centre est la position du premier point
-          _center = _point.pos;
+          _center = getCenter();
+          _mapController.move(_center, _zoom);
           // On récupère la liste des épreuves
           dbm.getEpreuve().then((value) => setState(() {
                 listeEpreuves = value;
-                nomEpreuve = listeEpreuves[0];
+                if (listeEpreuves.isNotEmpty) {
+                  nomEpreuve = listeEpreuves[0];
+                }
               }));
           // On récupère la liste de équipes
           dbm.readAllEquipe(listeEpreuves).then((value) => setState(() {
@@ -133,6 +136,19 @@ class HomeScreenState extends State<HomeScreen> {
         }
       });
     });
+  }
+
+  LatLng getCenter() {
+    /**
+     * Retroune le centre de la liste des points
+     *
+     * result :
+     *     - LatLng
+     */
+    var l = posPoints.length;
+    var lat = posPoints.fold(0, (sum, next) => sum + next.lat);
+    var long = posPoints.fold(0, (sum, next) => sum + next.long);
+    return LatLng(lat / l, long / l);
   }
 
   void dataFromFile() {
@@ -161,7 +177,8 @@ class HomeScreenState extends State<HomeScreen> {
           // le point sélectionné est le preimer
           _point = posPoints[0];
           // Le centre est la position du premier point
-          _center = _point.pos;
+          _center = getCenter();
+          _mapController.move(_center, _zoom);
           // On sauvegarde les données dans la base de donnée
           genben();
         });
@@ -249,6 +266,7 @@ class HomeScreenState extends State<HomeScreen> {
     /**
      * Sauvegarde l'état de l'affichage de la carte
      */
+    updateSearch("");
     // Si la carte est chargée
     if (_isMapReady) {
       // On enregistre le zoom, le centre et la rotation
@@ -610,7 +628,7 @@ class HomeScreenState extends State<HomeScreen> {
           updateSearch("");
           setState(() {
             // On trie les bénévoles par type
-            //ben.sort((a, b) => b.type - a.type);
+            ben.sort((a, b) => b.type - a.type);
             _searchInit = true;
           });
         }
@@ -827,11 +845,11 @@ class HomeScreenState extends State<HomeScreen> {
       resizeToAvoidBottomInset: false,
       // On superpose la carte et la barre de recherche
       body: Stack(
-    fit: StackFit.expand,
-    children: [
-      _buildMap(),
-      buildFloatingSearchBar(),
-    ],
+        fit: StackFit.expand,
+        children: [
+          _buildMap(),
+          buildFloatingSearchBar(),
+        ],
       ),
     );
   }
@@ -1000,17 +1018,10 @@ class HomeScreenState extends State<HomeScreen> {
         rotation: _rotation,
       ),
       layers: [
-        _isTileSetLoaded
-            // La carte hors ligne
-            ? TileLayerOptions(
-                urlTemplate: _offlineMapScheme,
-                tileProvider: const FileTileProvider(),
-              )
-            // La carte en ligne
-            : TileLayerOptions(
-                urlTemplate: _onlineMapScheme,
-                subdomains: ['a', 'b', 'c'],
-              ),
+        TileLayerOptions(
+          urlTemplate: _offlineMapScheme,
+          tileProvider: const FileTileProvider(),
+        ),
         // On affiche les lignes
         PolylineLayerOptions(polylines: getPolyLines()),
         // On affiche les points

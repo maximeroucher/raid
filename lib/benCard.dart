@@ -320,13 +320,13 @@ class benCardState extends State<benCard> {
                   SizedBox(
                     height: 30,
                     child: Text(
-                      e.dateDebut.hour.toString() +
+                      e.dateDebut.hour.toString().padLeft(2, '0') +
                           "h" +
-                          e.dateDebut.minute.toString() +
+                          e.dateDebut.minute.toString().padLeft(2, '0') +
                           " - " +
-                          e.dateFin.hour.toString() +
+                          e.dateFin.hour.toString().padLeft(2, '0') +
                           "h" +
-                          e.dateFin.minute.toString(),
+                          e.dateFin.minute.toString().padLeft(2, '0'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           // On change la couleur en fonction de si cette mission est la mission en cours
